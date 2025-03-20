@@ -15,7 +15,7 @@ import re
 class ScheduleSpecification():
     # 分析シート作成
     @classmethod
-    def createAnalysisSheet(cls, schedule, config):
+    def createSheetAnalysis(cls, schedule, config):
         members = config.getMembers()
 
         # 分析用の値作成
@@ -69,7 +69,7 @@ class ScheduleSpecification():
 
     # 稼働日シート作成
     @classmethod
-    def createBusinessDaysSheet(cls, config, startDate, endDate):
+    def createSheetBusinessDays(cls, config, startDate, endDate):
         # スケジュール開始日と終了日
         result = re.match("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})", startDate)
         d1 = datetime.date(int(result.group(1)), int(result.group(2)), int(result.group(3)))
@@ -152,7 +152,7 @@ class ScheduleSpecification():
 
     # 作業リストシートのヘッダ作成
     @classmethod
-    def createScheduleSheetHeader(cls, config):
+    def createSheetScheduleHeader(cls, config):
         # ヘッダの値
         values = [
             [
@@ -249,10 +249,10 @@ class ScheduleSpecification():
     @classmethod
     def toExcel(cls, schedule, config, startDate, endDate):
         sheets = [
-            cls.toSheet(schedule, config),
+            cls.createSheetSchedule(schedule, config),
             cls.createSheetProgress(config, startDate, endDate),
-            cls.createAnalysisSheet(schedule, config),
-            cls.createBusinessDaysSheet(config, startDate, endDate),
+            cls.createSheetAnalysis(schedule, config),
+            cls.createSheetBusinessDays(config, startDate, endDate),
         ]
         return Excel(
             f"スケジュール_{schedule.getName()}.xlsx",
@@ -260,9 +260,9 @@ class ScheduleSpecification():
         )
 
     @classmethod
-    def toSheet(cls, schedule, config):
+    def createSheetSchedule(cls, schedule, config):
         # シート行の作成
-        sheetRows = cls.createScheduleSheetHeader(config)
+        sheetRows = cls.createSheetScheduleHeader(config)
 
         # チケット別、フェーズ別の作業行を作成
         for _, ticket in enumerate(schedule.getTickets()):
