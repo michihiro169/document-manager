@@ -150,6 +150,75 @@ class ScheduleSpecification():
 
         return ExcelSheet("進捗", rows, widths)
 
+    @classmethod
+    def createSheetSchedule(cls, schedule, config):
+        # シート行の作成
+        sheetRows = cls.createSheetScheduleHeader(config)
+
+        # チケット別、フェーズ別の作業行を作成
+        for _, ticket in enumerate(schedule.getTickets()):
+            for phaseIndex, phase in enumerate(ticket.getPhases()):
+                for taskIndex, task in enumerate(phase.getTasks()):
+                    # チケット、フェーズが同じか
+                    isTicketTop = phaseIndex == 0 and taskIndex == 0
+                    isTicketLast = phaseIndex == len(ticket.getPhases()) - 1 and taskIndex == len(phase.getTasks()) - 1
+                    isPhaseTop = taskIndex == 0
+                    isPhaseLast = taskIndex == len(phase.getTasks()) - 1
+
+                    # IDセル
+                    IdCell = cls.toCell("=ROW()-2")
+                    # チケットセル
+                    ticketCell = cls.toCell(ticket.getName(), isTicketTop, isTicketLast)
+                    # フェーズセル
+                    phaseCell = cls.toCell(
+                        phase.getName(),
+                        isPhaseTop,
+                        isPhaseLast,
+                        task.getName() != ''
+                    )
+                    # タスクセル
+                    taskCell = cls.toCell(task.getName())
+                    # 見積のセル
+                    estimateCell = cls.toCell(task.getEstimate())
+                    # 実績のセル
+                    achievementCell = cls.toCell(task.getAchievement())
+                    # 状態のセル
+                    statusCell = cls.toCell(validationData = ["未着手", "作業中", "完了", "対応しない"])
+                    # 担当者のセル
+                    memberCell = cls.toCell(task.getMember(), validationData = config.getMembers())
+                    # サポートセル
+                    memberCells = []
+                    for _ in config.getMembers():
+                        memberCells.append(cls.toCell())
+                    # 施策セル
+                    initiativeCells = []
+                    for _ in config.getInitiatives():
+                        initiativeCells.append(cls.toCell(validationData = ['あり', 'なし', '対象外']))
+                    # 備考セル
+                    remarkCell = cls.toCell()
+
+                    row = [
+                        IdCell,
+                        ticketCell,
+                        phaseCell,
+                        taskCell,
+                        estimateCell,
+                        achievementCell,
+                        statusCell,
+                        memberCell,
+                    ] + memberCells + initiativeCells + [remarkCell]
+                    sheetRows.append(row)
+
+        # 列幅
+        widths = [4, 22, 22, 22, 7, 7, 11, 10]
+
+        return ExcelSheet(
+            "作業リスト",
+            sheetRows,
+            widths,
+            ExcelSheetAutoFilter('A2:N2')
+        )
+
     # 作業リストシートのヘッダ作成
     @classmethod
     def createSheetScheduleHeader(cls, config):
@@ -257,73 +326,4 @@ class ScheduleSpecification():
         return Excel(
             f"スケジュール_{schedule.getName()}.xlsx",
             sheets
-        )
-
-    @classmethod
-    def createSheetSchedule(cls, schedule, config):
-        # シート行の作成
-        sheetRows = cls.createSheetScheduleHeader(config)
-
-        # チケット別、フェーズ別の作業行を作成
-        for _, ticket in enumerate(schedule.getTickets()):
-            for phaseIndex, phase in enumerate(ticket.getPhases()):
-                for taskIndex, task in enumerate(phase.getTasks()):
-                    # チケット、フェーズが同じか
-                    isTicketTop = phaseIndex == 0 and taskIndex == 0
-                    isTicketLast = phaseIndex == len(ticket.getPhases()) - 1 and taskIndex == len(phase.getTasks()) - 1
-                    isPhaseTop = taskIndex == 0
-                    isPhaseLast = taskIndex == len(phase.getTasks()) - 1
-
-                    # IDセル
-                    IdCell = cls.toCell("=ROW()-2")
-                    # チケットセル
-                    ticketCell = cls.toCell(ticket.getName(), isTicketTop, isTicketLast)
-                    # フェーズセル
-                    phaseCell = cls.toCell(
-                        phase.getName(),
-                        isPhaseTop,
-                        isPhaseLast,
-                        task.getName() != ''
-                    )
-                    # タスクセル
-                    taskCell = cls.toCell(task.getName())
-                    # 見積のセル
-                    estimateCell = cls.toCell(task.getEstimate())
-                    # 実績のセル
-                    achievementCell = cls.toCell(task.getAchievement())
-                    # 状態のセル
-                    statusCell = cls.toCell(validationData = ["未着手", "作業中", "完了", "対応しない"])
-                    # 担当者のセル
-                    memberCell = cls.toCell(task.getMember(), validationData = config.getMembers())
-                    # サポートセル
-                    memberCells = []
-                    for _ in config.getMembers():
-                        memberCells.append(cls.toCell())
-                    # 施策セル
-                    initiativeCells = []
-                    for _ in config.getInitiatives():
-                        initiativeCells.append(cls.toCell(validationData = ['あり', 'なし', '対象外']))
-                    # 備考セル
-                    remarkCell = cls.toCell()
-
-                    row = [
-                        IdCell,
-                        ticketCell,
-                        phaseCell,
-                        taskCell,
-                        estimateCell,
-                        achievementCell,
-                        statusCell,
-                        memberCell,
-                    ] + memberCells + initiativeCells + [remarkCell]
-                    sheetRows.append(row)
-
-        # 列幅
-        widths = [4, 22, 22, 22, 7, 7, 11, 10]
-
-        return ExcelSheet(
-            "作業リスト",
-            sheetRows,
-            widths,
-            ExcelSheetAutoFilter('A2:N2')
         )
