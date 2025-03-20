@@ -4,6 +4,7 @@ from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment, Border, PatternFill, Side
 from openpyxl.worksheet.datavalidation import DataValidation
 from src.excel.excel_specification import ExcelSpecification
+import os
 
 class ExcelLib():
     @classmethod
@@ -76,5 +77,8 @@ class ExcelLib():
         # Sheet1を削除
         sheet1 = wb.active
         wb.remove(sheet1)
+        
+        if not os.path.exists("./build"):
+            os.makedirs("./build")
 
-        wb.save(f"build/{excel.getName()}")
+        wb.save(f"./build/{excel.getName()}")

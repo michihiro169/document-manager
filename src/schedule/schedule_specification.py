@@ -184,7 +184,7 @@ class ScheduleSpecification():
 
         # ヘッダの値に施策を追加
         initiatives = config.getInitiatives()
-        if len(initiatives) > 0:
+        if initiatives != None and len(initiatives) > 0:
             for i, initiative in enumerate(initiatives):
                 values[0].append({
                     'value': '施策' if i == 0 else '',

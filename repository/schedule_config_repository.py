@@ -15,4 +15,8 @@ class ScheduleConfigRepository():
         with open("./storage/schedule_config/休日.yml", 'r') as file:
             holidays = yaml.safe_load(file)
 
-        return ScheduleConfig(members, initiatives, holidays)
+        return ScheduleConfig(
+            members,
+            [] if initiatives == None else initiatives,
+            holidays
+        )
