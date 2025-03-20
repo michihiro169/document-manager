@@ -20,7 +20,7 @@ class ScheduleRepository():
                 phase = ticket[phaseName]
                 tasks = []
 
-                # 作業詳細名を飛ばしている場合
+                # フェーズと作業が同じ場合
                 if self.hasTask(phase):
                     phases.append(SchedulePhase(phaseName, [
                         ScheduleTask(
@@ -29,8 +29,7 @@ class ScheduleRepository():
                             phase['実績'] if phase != None and '実績' in phase else None,
                             phase['担当者'] if phase != None and '担当者' in phase else None
                         )
-                        ])
-                    )
+                    ]))
                     continue
 
                 for taskName in phase:

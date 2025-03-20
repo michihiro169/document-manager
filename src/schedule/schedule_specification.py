@@ -62,11 +62,7 @@ class ScheduleSpecification():
         for _, row in enumerate(values):
             cells = []
             for _, cell in enumerate(row):
-                cellStyle = ExcelSheetCellStyle(
-                    ExcelSheetCellBorder(None, None, None, None),
-                    ExcelSheetCellFill('solid', 'ffffff'),
-                    ExcelSheetCellAlignment('top'),
-                )
+                cellStyle = ExcelSheetCellStyle()
                 cell = ExcelSheetCell(cell, cellStyle)
                 cells.append(cell)
             rows.append(cells)
@@ -105,21 +101,15 @@ class ScheduleSpecification():
         # 稼働日から行作成
         rows = []
         for day in businessDays:
-            line = ExcelSheetCellLine('thin', '000000')
-            cellStyle = ExcelSheetCellStyle(
-                ExcelSheetCellBorder(line, line, line, line),
-                ExcelSheetCellFill('solid', 'ffffff'),
-                ExcelSheetCellAlignment('top'),
-            )
+            cellStyle = ExcelSheetCellStyle()
             rows.append([ExcelSheetCell(day, cellStyle)])
 
         return ExcelSheet("稼働日", rows, [11])
 
     # 進捗シート作成
     @classmethod
-    def createStatusSheet(cls, config, startDate, endDate):
-        # 進捗報告用の値作成
-        values = [
+    def createSheetProgress(cls, config, startDate, endDate):
+        rowValues = [
             ["開始日", startDate],
             ["終了日", endDate, "当日の業務終了時点でリリース状態にあること"],
             ["稼働日", f"=COUNT(稼働日!A:A)"],
@@ -132,17 +122,12 @@ class ScheduleSpecification():
             ["速度", f"=B9 / IF(COUNTIF(稼働日!A:A, TODAY()), MATCH(TODAY(), 稼働日!A:A), MATCH(MAX(稼働日!A:A), 稼働日!A:A))", "完了工数 / 作業n日目"],
         ]
 
-        # 行作成
         rows = []
-        for _, row in enumerate(values):
+        for _, rowValue in enumerate(rowValues):
             cells = []
-            for _, cell in enumerate(row):
-                cellStyle = ExcelSheetCellStyle(
-                    ExcelSheetCellBorder(None, None, None, None),
-                    ExcelSheetCellFill('solid', 'ffffff'),
-                    ExcelSheetCellAlignment('top')
-                )
-                cell = ExcelSheetCell(cell, cellStyle)
+            for _, cellValue in enumerate(rowValue):
+                cellStyle = ExcelSheetCellStyle()
+                cell = ExcelSheetCell(cellValue, cellStyle)
                 cells.append(cell)
             rows.append(cells)
 
@@ -220,7 +205,15 @@ class ScheduleSpecification():
         return rows
 
     @classmethod
-    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, wrapText = False):
+    def toCell(
+        cls,
+        value = "",
+        isTop = True,
+        isBottom = True,
+        isRight = True,
+        validationData = None,
+        wrapText = False
+    ):
         line = ExcelSheetCellLine('thin', '000000')
         return ExcelSheetCell(
             value,
@@ -228,8 +221,8 @@ class ScheduleSpecification():
                 ExcelSheetCellBorder(
                     line if isTop else None,
                     line if isBottom else None,
-                    line,
-                    line
+                    line if isRight else None,
+                    None
                 ),
                 ExcelSheetCellFill('solid', 'ffffff'),
                 ExcelSheetCellAlignment('top', wrapText),
@@ -243,7 +236,7 @@ class ScheduleSpecification():
     def toExcel(cls, schedule, config, startDate, endDate):
         sheets = [
             cls.toSheet(schedule, config),
-            cls.createStatusSheet(config, startDate, endDate),
+            cls.createSheetProgress(config, startDate, endDate),
             cls.createAnalysisSheet(schedule, config),
             cls.createBusinessDaysSheet(config, startDate, endDate),
         ]
@@ -258,10 +251,10 @@ class ScheduleSpecification():
         sheetRows = cls.createScheduleSheetHeader(config)
 
         # チケット別、フェーズ別の作業行を作成
-        for ticketIndex, ticket in enumerate(schedule.getTickets()):
+        for _, ticket in enumerate(schedule.getTickets()):
             for phaseIndex, phase in enumerate(ticket.getPhases()):
                 for taskIndex, task in enumerate(phase.getTasks()):
-                    # 部品名、テスト観点が同じか
+                    # チケット、フェーズが同じか
                     isTicketTop = phaseIndex == 0 and taskIndex == 0
                     isTicketLast = phaseIndex == len(ticket.getPhases()) - 1 and taskIndex == len(phase.getTasks()) - 1
                     isPhaseTop = taskIndex == 0
@@ -272,7 +265,12 @@ class ScheduleSpecification():
                     # チケットセル
                     ticketCell = cls.toCell(ticket.getName(), isTicketTop, isTicketLast)
                     # フェーズセル
-                    phaseCell = cls.toCell(phase.getName(), isPhaseTop, isPhaseLast, config.getMembers())
+                    phaseCell = cls.toCell(
+                        phase.getName(),
+                        isPhaseTop,
+                        isPhaseLast,
+                        task.getName() != ""
+                    )
                     # タスクセル
                     taskCell = cls.toCell(task.getName())
                     # 見積のセル
@@ -285,11 +283,11 @@ class ScheduleSpecification():
                     memberCell = cls.toCell(task.getMember(), validationData = config.getMembers())
                     # サポートセル
                     memberCells = []
-                    for member in config.getMembers():
+                    for _ in config.getMembers():
                         memberCells.append(cls.toCell())
                     # 施策セル
                     initiativeCells = []
-                    for initiative in config.getInitiatives():
+                    for _ in config.getInitiatives():
                         initiativeCells.append(cls.toCell(validationData = ['あり', 'なし', '対象外']))
                     # 備考セル
                     remarkCell = cls.toCell()
@@ -307,7 +305,7 @@ class ScheduleSpecification():
                     sheetRows.append(row)
 
         # 列幅
-        widths = [3, 22, 22, 22, 7, 7, 11, 10]
+        widths = [4, 22, 22, 22, 7, 7, 11, 10]
 
         return ExcelSheet(
             "作業リスト",

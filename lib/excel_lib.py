@@ -49,20 +49,26 @@ class ExcelLib():
                     alignment = style.getAlignment()
                     border = style.getBorder()
                     # 塗りつぶし
-                    ws[rowIndex + 1][cellIndex].fill = PatternFill(fill_type=style.getFill().getType(), fgColor=style.getFill().getColor())
+                    if style.hasFill():
+                        ws[rowIndex + 1][cellIndex].fill = PatternFill(
+                            fill_type = style.getFill().getType(),
+                            fgColor   = style.getFill().getColor()
+                        )
                     # 罫線
-                    side = Side(style='thin', color='000000')
-                    ws[rowIndex + 1][cellIndex].border = Border(
-                        top = side if border.hasTop() else None,
-                        bottom = side if border.hasBottom() else None,
-                        left = side if border.hasLeft() else None,
-                        right = side if border.hasRight() else None
-                    )
+                    if border != None:
+                        side = Side(style='thin', color='000000')
+                        ws[rowIndex + 1][cellIndex].border = Border(
+                            top = side if border.hasTop() else None,
+                            bottom = side if border.hasBottom() else None,
+                            left = side if border.hasLeft() else None,
+                            right = side if border.hasRight() else None
+                        )
                     # 配置
-                    ws[rowIndex + 1][cellIndex].alignment = Alignment(
-                        vertical = alignment.getVertical(),
-                        wrapText = alignment.getWrapText()
-                    )
+                    if alignment != None:
+                        ws[rowIndex + 1][cellIndex].alignment = Alignment(
+                            vertical = alignment.getVertical(),
+                            wrapText = alignment.getWrapText()
+                        )
                     # フォント
                     if style.hasFont():
                         ws[rowIndex + 1][cellIndex].font = Font(color=style.getFont().getColor())
