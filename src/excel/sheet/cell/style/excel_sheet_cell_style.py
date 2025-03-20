@@ -1,5 +1,11 @@
 class ExcelSheetCellStyle():
-    def __init__(self, border, fill, alignment, font = None) -> None:
+    def __init__(
+        self,
+        border = None,
+        fill = None,
+        alignment = None,
+        font = None
+    ) -> None:
         self.border = border
         self.fill = fill
         self.alignment = alignment
@@ -16,6 +22,9 @@ class ExcelSheetCellStyle():
 
     def getFont(self):
         return self.font
+
+    def hasFill(self):
+        return self.fill != None
 
     def hasFont(self):
         return self.font != None
