@@ -27,11 +27,6 @@ class ScheduleSpecification():
             values.append([f"=SUMIF(作業リスト!H:H,\"{member}\",作業リスト!F:F) / (進捗!B3 * 8)"])
         values.append([''])
 
-        # 全体の速度
-        values.append(['全体の速度'])
-        values.append(["=進捗!B7/(進捗!B4)", '実績工数合計 / 人員数'])
-        values.append([''])
-
         # チケット別の超過率
         tickets = schedule.getTickets()
         values.append(['チケット別の超過率', 'チケットが{名前}の行の実績の合計 / チケットが{名前}の行の見積の合計'])
@@ -110,16 +105,35 @@ class ScheduleSpecification():
     @classmethod
     def createSheetProgress(cls, config, startDate, endDate):
         rowValues = [
-            ["開始日", startDate],
-            ["終了日", endDate, "当日の業務終了時点でリリース状態にあること"],
-            ["稼働日", f"=COUNT(稼働日!A:A)"],
-            ["人員数", len(config.getMembers())],
-            ["予算工数", f"=B3 * B4 * 8", "稼働日 * 人員数 * 8h"],
-            ["見積工数合計", f"=SUM(作業リスト!E:E)", 'リリースに必要な全ての作業について見積もった工数。予算工数との差分はバッファとして確保'],
-            ["実績工数合計", f'=SUM(作業リスト!F:F)', '人員が実際に消費した工数'],
-            ["完了予定工数", f'=MATCH(TODAY(), 稼働日!A:A) * 8 * B4', '作業n日目 * 8h * 人員数。完了工数と一致していればオンスケ'],
-            ["完了工数", f'=SUMIF(作業リスト!G:G,"完了", 作業リスト!F:F) + SUMIF(作業リスト!G:G, "対応しない", 作業リスト!F:F)', '状態が完了または対応しないの作業の合計'],
-            ["速度", f"=B9 / IF(COUNTIF(稼働日!A:A, TODAY()), MATCH(TODAY(), 稼働日!A:A), MATCH(MAX(稼働日!A:A), 稼働日!A:A))", "完了工数 / 作業n日目"],
+            ['開始日'],
+            [startDate],
+            [''],
+            ['終了日'],
+            [endDate],
+            [''],
+            ['稼働日'],
+            ['=COUNT(稼働日!A:A)'],
+            [''],
+            ['人員数'],
+            [len(config.getMembers())],
+            [''],
+            ['予算工数合計', '', '稼働日', '', '8h', '', '人員数'],
+            ['=C14 * E14 * G14', '=', '=A8', '*', '8', '*', '=A11'],
+            [''],
+            ['見積工数合計'],
+            ['=SUM(作業リスト!E:E)'],
+            [''],
+            ['実績工数合計'],
+            ['=SUM(作業リスト!F:F)'],
+            [''],
+            ['完了予定工数', '', '作業n日目', '', '8h', '', '人員数'],
+            ['=C23 * E23 * G23', '=', '=MATCH(TODAY(), 稼働日!A:A)', '*', '8', '*', '=A11'],
+            [''],
+            ['完了工数', '', '状態が完了', '', '状態が対応しない'],
+            ['=C26 + E26', '=', '=SUMIF(作業リスト!G:G,"完了", 作業リスト!F:F)', '+', '=SUMIF(作業リスト!G:G, "対応しない", 作業リスト!F:F)'],
+            [''],
+            ['速度', '', '完了工数', '', '作業n日目'],
+            ['=C29 / E29', '=', '=A26', '/', '=IF(COUNTIF(稼働日!A:A, TODAY()), MATCH(TODAY(), 稼働日!A:A), MATCH(MAX(稼働日!A:A), 稼働日!A:A))'],
         ]
 
         rows = []
@@ -132,7 +146,7 @@ class ScheduleSpecification():
             rows.append(cells)
 
         # 列幅
-        widths = [14, 10, 78]
+        widths = [14, 2, 11, 2, 17, 2, 7]
 
         return ExcelSheet("進捗", rows, widths)
 
@@ -207,7 +221,7 @@ class ScheduleSpecification():
     @classmethod
     def toCell(
         cls,
-        value = "",
+        value = '',
         isTop = True,
         isBottom = True,
         isRight = True,
@@ -269,7 +283,7 @@ class ScheduleSpecification():
                         phase.getName(),
                         isPhaseTop,
                         isPhaseLast,
-                        task.getName() != ""
+                        task.getName() != ''
                     )
                     # タスクセル
                     taskCell = cls.toCell(task.getName())
