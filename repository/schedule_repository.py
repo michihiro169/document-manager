@@ -27,7 +27,7 @@ class ScheduleRepository():
                             '',
                             phase['見積'] if phase != None and '見積' in phase else None,
                             phase['実績'] if phase != None and '実績' in phase else None,
-                            phase['担当者'] if phase != None and '担当者' in phase else None
+                            phase['担当'] if phase != None and '担当' in phase else None
                         )
                     ]))
                     continue
@@ -38,7 +38,7 @@ class ScheduleRepository():
                         taskName,
                         task['見積'] if task != None else None,
                         task['実績'] if task != None else None,
-                        task['担当者'] if task != None else None
+                        task['担当'] if task != None else None
                     ))
 
                 phases.append(SchedulePhase(phaseName, tasks))
@@ -51,4 +51,4 @@ class ScheduleRepository():
     def hasTask(self, data):
         if data == None:
             return True
-        return '見積' in data or '実績' in data or '担当者' in data
+        return '見積' in data or '実績' in data or '担当' in data

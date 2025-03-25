@@ -22,7 +22,7 @@ class ScheduleSpecification():
         values = []
 
         # 作業者別の稼働率
-        values.append(["作業者別の稼働率", '担当者が{名前}の行の実績の合計 / 稼働日 * 8'])
+        values.append(["作業者別の稼働率", '担当が{名前}の行の実績の合計 / 稼働日 * 8'])
         for member in members:
             values.append([f"=SUMIF(作業リスト!H:H,\"{member}\",作業リスト!F:F) / (進捗!B3 * 8)"])
         values.append([''])
@@ -34,14 +34,14 @@ class ScheduleSpecification():
             values.append([f"=SUMIF(作業リスト!B:B,\"{ticket.getName()}\",作業リスト!F:F) / SUMIF(作業リスト!B:B,\"{ticket.getName()}\",作業リスト!E:E)"])
         values.append([''])
 
-        # 担当者別の超過率
-        values.append(['担当者別の超過率', '担当者が{名前}の行の実績の合計 / チケットが{名前}の行の見積の合計'])
+        # 担当別の超過率
+        values.append(['担当別の超過率', '担当が{名前}の行の実績の合計 / チケットが{名前}の行の見積の合計'])
         for member in members:
             values.append([f"=SUMIF(作業リスト!H:H,\"{member}\",作業リスト!F:F) / SUMIF(作業リスト!H:H,\"{ticket.getName()}\",作業リスト!E:E)"])
         values.append([''])
 
-        # 担当者 * 作業 別の超過率
-        values.append(['担当者 * 作業 別の超過率'])
+        # 担当 * 作業 別の超過率
+        values.append(['担当 * 作業 別の超過率'])
         values.append([''])
 
         # 作業者の一人称率
@@ -184,7 +184,7 @@ class ScheduleSpecification():
                     achievementCell = cls.toCell(task.getAchievement())
                     # 状態のセル
                     statusCell = cls.toCell(validationData = ["未着手", "作業中", "完了", "対応しない"])
-                    # 担当者のセル
+                    # 担当のセル
                     memberCell = cls.toCell(task.getMember(), validationData = config.getMembers())
                     # サポートセル
                     memberCells = []
@@ -232,7 +232,7 @@ class ScheduleSpecification():
                 {'value': '見積(h)', 'border':{'top': True, 'right': True, 'left': True}},
                 {'value': '実績(h)', 'border':{'top': True, 'right': True, 'left': True}},
                 {'value': '状態', 'border':{'top': True, 'right': True, 'left': True}},
-                {'value': '担当者', 'border':{'top': True, 'right': True, 'left': True}}
+                {'value': '担当', 'border':{'top': True, 'right': True, 'left': True}}
             ]
         ]
         values.append([{'value': '', 'border':{'left': True, 'right': True, 'bottom': True}} for i in range(len(values[0]))])
