@@ -36,9 +36,9 @@ class ScheduleRepository():
                     task = phase[taskName]
                     tasks.append(ScheduleTask(
                         taskName,
-                        task['見積'] if task != None else None,
-                        task['実績'] if task != None else None,
-                        task['担当'] if task != None else None
+                        task['見積'] if task != None and '見積' in task  else None,
+                        task['実績'] if task != None and '実績' in task  else None,
+                        task['担当'] if task != None and '担当' in task  else None
                     ))
 
                 phases.append(SchedulePhase(phaseName, tasks))
