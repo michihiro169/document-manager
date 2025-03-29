@@ -13,6 +13,18 @@ import datetime
 
 class TestBlockSpecification():
     @classmethod
+    def createPerspectiveSheet(cls, config):
+        perspectives = config.getPerspectives()
+        rows = []
+        for name in perspectives:
+            cells = [
+                ExcelSheetCell(name),
+                ExcelSheetCell('') if perspectives[name] == None else ExcelSheetCell(perspectives[name])
+            ]
+            rows.append(cells)
+        return ExcelSheet("テスト観点", rows)
+
+    @classmethod
     def createStatusSheet(cls):
         values = [
             ["テストケース総数", f"=MAX(テストケース!A:A)"],
@@ -24,7 +36,7 @@ class TestBlockSpecification():
 
         # 行作成
         rows = []
-        for rowIndex, row in enumerate(values):
+        for _, row in enumerate(values):
             cells = []
             for cellIndex, cell in enumerate(row):
                 line = ExcelSheetCellLine('thin', '000000')
@@ -57,6 +69,96 @@ class TestBlockSpecification():
             rows.append([cell])
 
         return ExcelSheet("事前準備・注意点", rows)
+
+    @classmethod
+    def createTestCaseAndEvidenceSheet(cls, testBlock, testConfig):
+        # シート行の作成
+        testCaseSheetRows = [cls.createTestCaseSheetHeaderCells()]
+        evidenceSheetRows = []
+
+        # テストオブジェクトと共通のテストを結合
+        elements = [testConfig.getTestBlockElement()] + testBlock.getElements()
+
+        # テストオブジェクトのテストケース行の作成
+        headerLen = len(testCaseSheetRows)
+        testCaseCount = 0
+        evidenceSheetRowLen = 30
+        evidenceSheetRowIndex = 1
+        for _, element in enumerate(elements):
+            for perspectiveIndex, perspective in enumerate(element.getPerspectives()):
+                for caseIndex, case in enumerate(perspective.getCases()):
+                    testCaseCount += 1
+
+                    # 部品名、テスト観点が同じか
+                    isElementTop = perspectiveIndex == 0 and caseIndex == 0
+                    isElementLast = perspectiveIndex == len(element.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
+                    isPerspectiveTop = caseIndex == 0
+                    isPerspectiveLast = caseIndex == len(perspective.getCases()) - 1
+
+                    # IDセル
+                    IdCell = cls.toCell("=ROW()-1")
+                    # 部品セル
+                    elementCell = cls.toCell(element.getName(), isElementTop, isElementLast)
+                    # テスト観点セル
+                    perspectiveCell = cls.toCell(
+                        perspective.getName(),
+                        isPerspectiveTop,
+                        isPerspectiveLast,
+                        list(testConfig.getPerspectives().keys())
+                    )
+                    # テストパターンセル
+                    patternCell = cls.toCell(case.getPattern())
+
+                    # 手順セル
+                    procedures = ['・' + procedure for procedure in case.getProcedures()]
+                    procedureCell = cls.toCell(
+                        "\r\n".join(procedures + ['・結果をエビデンスシートに記載'] if case.needsEvidence else procedures),
+                        wrapText = True,
+                        hyperLink= f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
+                    )
+                    if case.needsEvidence:
+                        value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()])
+                        evidenceSheetRows.append([ExcelSheetCell(value, hyperLink=f"#テストケース!A{testCaseCount + headerLen}")])
+                        for _ in range(evidenceSheetRowLen - 1):
+                            evidenceSheetRows.append([])
+                        evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
+
+                    # 想定結果セル
+                    forecastCell = cls.toCell(
+                        "\r\n".join(['・' + forecast for forecast in case.getForecasts()]),
+                        wrapText = True
+                    )
+                    # 実施結果、実施日、実施者、備考セル
+                    resultCell = cls.toCell(validationData = ["○", "×", "-"])
+                    dateCell = cls.toCell()
+                    personCell = cls.toCell()
+                    remarkCell = cls.toCell()
+
+                    testCaseSheetRows.append([
+                        IdCell,
+                        elementCell,
+                        perspectiveCell,
+                        patternCell,
+                        procedureCell,
+                        forecastCell,
+                        resultCell,
+                        dateCell,
+                        personCell,
+                        remarkCell,
+                    ])
+
+        # 列幅
+        widths = [5, 16, 15, 16, 40, 40, 11, 9, 9, 40]
+
+        return [
+            ExcelSheet(
+                "テストケース",
+                testCaseSheetRows,
+                widths,
+                ExcelSheetAutoFilter('A1:J1')
+            ),
+            ExcelSheet("エビデンス", evidenceSheetRows)
+        ]
 
     @classmethod
     def createTestCaseSheetHeaderCells(cls):
@@ -125,98 +227,9 @@ class TestBlockSpecification():
 
         sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
         sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
+        sheets.append(cls.createPerspectiveSheet(testConfig))
 
         return Excel(
             f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
             sheets
         )
-
-    @classmethod
-    def createTestCaseAndEvidenceSheet(cls, testBlock, testConfig):
-        # シート行の作成
-        testCaseSheetRows = [cls.createTestCaseSheetHeaderCells()]
-        evidenceSheetRows = []
-
-        # テストオブジェクトと共通のテストを結合
-        elements = [testConfig.getTestBlockElement()] + testBlock.getElements()
-
-        # テストオブジェクトのテストケース行の作成
-        headerLen = len(testCaseSheetRows)
-        testCaseCount = 0
-        evidenceSheetRowLen = 30
-        evidenceSheetRowIndex = 1
-        for _, element in enumerate(elements):
-            for perspectiveIndex, perspective in enumerate(element.getPerspectives()):
-                for caseIndex, case in enumerate(perspective.getCases()):
-                    testCaseCount += 1
-
-                    # 部品名、テスト観点が同じか
-                    isElementTop = perspectiveIndex == 0 and caseIndex == 0
-                    isElementLast = perspectiveIndex == len(element.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
-                    isPerspectiveTop = caseIndex == 0
-                    isPerspectiveLast = caseIndex == len(perspective.getCases()) - 1
-
-                    # IDセル
-                    IdCell = cls.toCell("=ROW()-1")
-                    # 部品セル
-                    elementCell = cls.toCell(element.getName(), isElementTop, isElementLast)
-                    # テスト観点セル
-                    perspectiveCell = cls.toCell(
-                        perspective.getName(),
-                        isPerspectiveTop,
-                        isPerspectiveLast,
-                        testConfig.getPerspectives()
-                    )
-                    # テストパターンセル
-                    patternCell = cls.toCell(case.getPattern())
-
-                    # 手順セル
-                    procedures = ['・' + procedure for procedure in case.getProcedures()]
-                    procedureCell = cls.toCell(
-                        "\r\n".join(procedures + ['・結果をエビデンスシートに記載'] if case.needsEvidence else procedures),
-                        wrapText = True,
-                        hyperLink= f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
-                    )
-                    if case.needsEvidence:
-                        value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()])
-                        evidenceSheetRows.append([ExcelSheetCell(value, hyperLink=f"#テストケース!A{testCaseCount + headerLen}")])
-                        for _ in range(evidenceSheetRowLen - 1):
-                            evidenceSheetRows.append([])
-                        evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
-
-                    # 想定結果セル
-                    forecastCell = cls.toCell(
-                        "\r\n".join(['・' + forecast for forecast in case.getForecasts()]),
-                        wrapText = True
-                    )
-                    # 実施結果、実施日、実施者、備考セル
-                    resultCell = cls.toCell(validationData = ["○", "×", "-"])
-                    dateCell = cls.toCell()
-                    personCell = cls.toCell()
-                    remarkCell = cls.toCell()
-
-                    testCaseSheetRows.append([
-                        IdCell,
-                        elementCell,
-                        perspectiveCell,
-                        patternCell,
-                        procedureCell,
-                        forecastCell,
-                        resultCell,
-                        dateCell,
-                        personCell,
-                        remarkCell,
-                    ])
-
-        # 列幅
-        widths = [5, 16, 15, 16, 40, 40, 11, 9, 9, 40]
-
-        return [
-            ExcelSheet(
-                "テストケース",
-                testCaseSheetRows,
-                widths,
-                ExcelSheetAutoFilter('A1:J1')
-            ),
-            ExcelSheet("エビデンス", evidenceSheetRows)
-        ]
