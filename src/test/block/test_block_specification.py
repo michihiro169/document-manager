@@ -71,80 +71,6 @@ class TestBlockSpecification():
         return ExcelSheet("事前準備・注意点", rows)
 
     @classmethod
-    def createTestCaseSheetHeaderCells(cls):
-        headerValues = [
-            "ID",
-            "部品名",
-            "テスト観点",
-            "テストパターン",
-            "手順",
-            "想定結果",
-            "実施結果\n{環境名}",
-            "実施日",
-            "実施者",
-            "備考"
-        ]
-
-        headerCells = []
-        for i, value in enumerate(headerValues):
-            line = ExcelSheetCellLine('thin', '000000')
-            cellStyle = ExcelSheetCellStyle(
-                ExcelSheetCellBorder(line, line, line, line),
-                ExcelSheetCellFill('solid', 'c8e6c6'),
-                ExcelSheetCellAlignment('top', wrapText = True)
-            )
-            cell = ExcelSheetCell(value, cellStyle)
-            headerCells.append(cell)
-        return headerCells
-
-    @classmethod
-    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, wrapText = False, hyperLink=None):
-        line = ExcelSheetCellLine('thin', '000000')
-        return ExcelSheetCell(
-            value,
-            ExcelSheetCellStyle(
-                ExcelSheetCellBorder(
-                    line if isTop else None,
-                    line if isBottom else None,
-                    line,
-                    line
-                ),
-                ExcelSheetCellFill('solid', 'ffffff'),
-                ExcelSheetCellAlignment('top', wrapText),
-                # 白字はフィルタ用
-                ExcelSheetCellFont('000000') if isTop else ExcelSheetCellFont('ffffff'),
-            ),
-            validationData,
-            hyperLink
-        )
-
-    @classmethod
-    def toExcel(cls, testBlock, testConfig):
-        testBlockName = testBlock.getName()
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
-
-        sheets = [
-            cls.createStatusSheet()
-        ]
-
-        if testBlock.hasImage():
-            image = ExcelSheetImage(
-                testBlock.getImage().getPath(),
-                testBlock.getImage().getWidth(),
-                testBlock.getImage().getHeight()
-            )
-            sheets.append(ExcelSheet("画面イメージ", images=[image]))
-
-        sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
-        sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
-        sheets.append(cls.createPerspectiveSheet(testConfig))
-
-        return Excel(
-            f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
-            sheets
-        )
-
-    @classmethod
     def createTestCaseAndEvidenceSheet(cls, testBlock, testConfig):
         # シート行の作成
         testCaseSheetRows = [cls.createTestCaseSheetHeaderCells()]
@@ -233,3 +159,77 @@ class TestBlockSpecification():
             ),
             ExcelSheet("エビデンス", evidenceSheetRows)
         ]
+
+    @classmethod
+    def createTestCaseSheetHeaderCells(cls):
+        headerValues = [
+            "ID",
+            "部品名",
+            "テスト観点",
+            "テストパターン",
+            "手順",
+            "想定結果",
+            "実施結果\n{環境名}",
+            "実施日",
+            "実施者",
+            "備考"
+        ]
+
+        headerCells = []
+        for i, value in enumerate(headerValues):
+            line = ExcelSheetCellLine('thin', '000000')
+            cellStyle = ExcelSheetCellStyle(
+                ExcelSheetCellBorder(line, line, line, line),
+                ExcelSheetCellFill('solid', 'c8e6c6'),
+                ExcelSheetCellAlignment('top', wrapText = True)
+            )
+            cell = ExcelSheetCell(value, cellStyle)
+            headerCells.append(cell)
+        return headerCells
+
+    @classmethod
+    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, wrapText = False, hyperLink=None):
+        line = ExcelSheetCellLine('thin', '000000')
+        return ExcelSheetCell(
+            value,
+            ExcelSheetCellStyle(
+                ExcelSheetCellBorder(
+                    line if isTop else None,
+                    line if isBottom else None,
+                    line,
+                    line
+                ),
+                ExcelSheetCellFill('solid', 'ffffff'),
+                ExcelSheetCellAlignment('top', wrapText),
+                # 白字はフィルタ用
+                ExcelSheetCellFont('000000') if isTop else ExcelSheetCellFont('ffffff'),
+            ),
+            validationData,
+            hyperLink
+        )
+
+    @classmethod
+    def toExcel(cls, testBlock, testConfig):
+        testBlockName = testBlock.getName()
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
+
+        sheets = [
+            cls.createStatusSheet()
+        ]
+
+        if testBlock.hasImage():
+            image = ExcelSheetImage(
+                testBlock.getImage().getPath(),
+                testBlock.getImage().getWidth(),
+                testBlock.getImage().getHeight()
+            )
+            sheets.append(ExcelSheet("画面イメージ", images=[image]))
+
+        sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
+        sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
+        sheets.append(cls.createPerspectiveSheet(testConfig))
+
+        return Excel(
+            f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
+            sheets
+        )
