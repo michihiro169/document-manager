@@ -13,6 +13,18 @@ import datetime
 
 class TestBlockSpecification():
     @classmethod
+    def createPerspectiveSheet(cls, config):
+        perspectives = config.getPerspectives()
+        rows = []
+        for name in perspectives:
+            cells = [
+                ExcelSheetCell(name),
+                ExcelSheetCell('') if perspectives[name] == None else ExcelSheetCell(perspectives[name])
+            ]
+            rows.append(cells)
+        return ExcelSheet("テスト観点", rows)
+
+    @classmethod
     def createStatusSheet(cls):
         values = [
             ["テストケース総数", f"=MAX(テストケース!A:A)"],
@@ -24,7 +36,7 @@ class TestBlockSpecification():
 
         # 行作成
         rows = []
-        for rowIndex, row in enumerate(values):
+        for _, row in enumerate(values):
             cells = []
             for cellIndex, cell in enumerate(row):
                 line = ExcelSheetCellLine('thin', '000000')
@@ -125,6 +137,7 @@ class TestBlockSpecification():
 
         sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
         sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
+        sheets.append(cls.createPerspectiveSheet(testConfig))
 
         return Excel(
             f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
@@ -165,7 +178,7 @@ class TestBlockSpecification():
                         perspective.getName(),
                         isPerspectiveTop,
                         isPerspectiveLast,
-                        testConfig.getPerspectives()
+                        list(testConfig.getPerspectives().keys())
                     )
                     # テストパターンセル
                     patternCell = cls.toCell(case.getPattern())
