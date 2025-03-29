@@ -11,7 +11,7 @@ from src.excel.sheet.cell.line.excel_sheet_cell_line import ExcelSheetCellLine
 from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyle
 import datetime
 
-class TestObjectSpecification():
+class TestBlockSpecification():
     @classmethod
     def createStatusSheet(cls):
         values = [
@@ -106,54 +106,54 @@ class TestObjectSpecification():
         )
 
     @classmethod
-    def toExcel(cls, testObject, testConfig):
-        testObjectName = testObject.getName()
+    def toExcel(cls, testBlock, testConfig):
+        testBlockName = testBlock.getName()
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
 
         sheets = [
             cls.createStatusSheet(),
-            cls.createPreparationSheet(testObject.getPreparation()),
+            cls.createPreparationSheet(testBlock.getPreparation()),
             # テストケースシート
-            cls.toSheet(testObject, testConfig),
+            cls.toSheet(testBlock, testConfig),
         ]
 
-        if testObject.hasImage():
+        if testBlock.hasImage():
             image = ExcelSheetImage(
-                testObject.getImage().getPath(),
-                testObject.getImage().getWidth(),
-                testObject.getImage().getHeight()
+                testBlock.getImage().getPath(),
+                testBlock.getImage().getWidth(),
+                testBlock.getImage().getHeight()
             )
             sheets.append(ExcelSheet("画面イメージ", images=[image]))
 
         sheets.append(ExcelSheet("エビデンス"))
 
         return Excel(
-            f"結合テスト仕様書_{testObjectName}_{timestamp}.xlsx",
+            f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
             sheets
         )
 
     @classmethod
-    def toSheet(cls, testObject, testConfig):
+    def toSheet(cls, testBlock, testConfig):
         # シート行の作成
         sheetRows = [cls.createTestCaseSheetHeaderCells()]
 
         # テストオブジェクトと共通のテストを結合
-        parts = [testConfig.getTestObjectPart()] + testObject.getParts()
+        elements = [testConfig.getTestBlockElement()] + testBlock.getElements()
 
         # テストオブジェクトのテストケース行の作成
-        for partIndex, part in enumerate(parts):
-            for perspectiveIndex, perspective in enumerate(part.getPerspectives()):
+        for elementIndex, element in enumerate(elements):
+            for perspectiveIndex, perspective in enumerate(element.getPerspectives()):
                 for caseIndex, case in enumerate(perspective.getCases()):
                     # 部品名、テスト観点が同じか
-                    isPartTop = perspectiveIndex == 0 and caseIndex == 0
-                    isPartLast = perspectiveIndex == len(part.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
+                    isElementTop = perspectiveIndex == 0 and caseIndex == 0
+                    isElementLast = perspectiveIndex == len(element.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
                     isPerspectiveTop = caseIndex == 0
                     isPerspectiveLast = caseIndex == len(perspective.getCases()) - 1
 
                     # IDセル
                     IdCell = cls.toCell("=ROW()-1")
                     # 部品セル
-                    partCell = cls.toCell(part.getName(), isPartTop, isPartLast)
+                    elementCell = cls.toCell(element.getName(), isElementTop, isElementLast)
                     # テスト観点セル
                     perspectiveCell = cls.toCell(
                         perspective.getName(),
@@ -181,7 +181,7 @@ class TestObjectSpecification():
 
                     sheetRows.append([
                         IdCell,
-                        partCell,
+                        elementCell,
                         perspectiveCell,
                         patternCell,
                         procedureCell,
