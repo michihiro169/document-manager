@@ -86,7 +86,7 @@ class TestBlockSpecification():
         return headerCells
 
     @classmethod
-    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, wrapText = False):
+    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, wrapText = False, hyperLink=None):
         line = ExcelSheetCellLine('thin', '000000')
         return ExcelSheetCell(
             value,
@@ -102,7 +102,8 @@ class TestBlockSpecification():
                 # 白字はフィルタ用
                 ExcelSheetCellFont('000000') if isTop else ExcelSheetCellFont('ffffff'),
             ),
-            validationData
+            validationData,
+            hyperLink
         )
 
     @classmethod
@@ -111,10 +112,7 @@ class TestBlockSpecification():
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
 
         sheets = [
-            cls.createStatusSheet(),
-            cls.createPreparationSheet(testBlock.getPreparation()),
-            # テストケースシート
-            cls.toSheet(testBlock, testConfig),
+            cls.createStatusSheet()
         ]
 
         if testBlock.hasImage():
@@ -125,7 +123,8 @@ class TestBlockSpecification():
             )
             sheets.append(ExcelSheet("画面イメージ", images=[image]))
 
-        sheets.append(ExcelSheet("エビデンス"))
+        sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
+        sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
 
         return Excel(
             f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
@@ -133,17 +132,24 @@ class TestBlockSpecification():
         )
 
     @classmethod
-    def toSheet(cls, testBlock, testConfig):
+    def createTestCaseAndEvidenceSheet(cls, testBlock, testConfig):
         # シート行の作成
-        sheetRows = [cls.createTestCaseSheetHeaderCells()]
+        testCaseSheetRows = [cls.createTestCaseSheetHeaderCells()]
+        evidenceSheetRows = []
 
         # テストオブジェクトと共通のテストを結合
         elements = [testConfig.getTestBlockElement()] + testBlock.getElements()
 
         # テストオブジェクトのテストケース行の作成
-        for elementIndex, element in enumerate(elements):
+        headerLen = len(testCaseSheetRows)
+        testCaseCount = 0
+        evidenceSheetRowLen = 30
+        evidenceSheetRowIndex = 1
+        for _, element in enumerate(elements):
             for perspectiveIndex, perspective in enumerate(element.getPerspectives()):
                 for caseIndex, case in enumerate(perspective.getCases()):
+                    testCaseCount += 1
+
                     # 部品名、テスト観点が同じか
                     isElementTop = perspectiveIndex == 0 and caseIndex == 0
                     isElementLast = perspectiveIndex == len(element.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
@@ -163,12 +169,22 @@ class TestBlockSpecification():
                     )
                     # テストパターンセル
                     patternCell = cls.toCell(case.getPattern())
-                    # 手順のセル
+
+                    # 手順セル
+                    procedures = ['・' + procedure for procedure in case.getProcedures()]
                     procedureCell = cls.toCell(
-                        "\r\n".join(['・' + procedure for procedure in case.getProcedures()]),
-                        wrapText = True
+                        "\r\n".join(procedures + ['・結果をエビデンスシートに記載'] if case.needsEvidence else procedures),
+                        wrapText = True,
+                        hyperLink= f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
                     )
-                    # 想定結果のセル
+                    if case.needsEvidence:
+                        value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()])
+                        evidenceSheetRows.append([ExcelSheetCell(value, hyperLink=f"#テストケース!A{testCaseCount + headerLen}")])
+                        for _ in range(evidenceSheetRowLen - 1):
+                            evidenceSheetRows.append([])
+                        evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
+
+                    # 想定結果セル
                     forecastCell = cls.toCell(
                         "\r\n".join(['・' + forecast for forecast in case.getForecasts()]),
                         wrapText = True
@@ -179,7 +195,7 @@ class TestBlockSpecification():
                     personCell = cls.toCell()
                     remarkCell = cls.toCell()
 
-                    sheetRows.append([
+                    testCaseSheetRows.append([
                         IdCell,
                         elementCell,
                         perspectiveCell,
@@ -195,9 +211,12 @@ class TestBlockSpecification():
         # 列幅
         widths = [5, 16, 15, 16, 40, 40, 11, 9, 9, 40]
 
-        return ExcelSheet(
-            "テストケース",
-            sheetRows,
-            widths,
-            ExcelSheetAutoFilter('A1:J1')
-        )
+        return [
+            ExcelSheet(
+                "テストケース",
+                testCaseSheetRows,
+                widths,
+                ExcelSheetAutoFilter('A1:J1')
+            ),
+            ExcelSheet("エビデンス", evidenceSheetRows)
+        ]
