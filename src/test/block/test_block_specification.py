@@ -67,7 +67,7 @@ class TestBlockSpecification():
             "テストパターン",
             "手順",
             "想定結果",
-            "実施結果",
+            "実施結果\n{環境名}",
             "実施日",
             "実施者",
             "備考"
@@ -79,7 +79,7 @@ class TestBlockSpecification():
             cellStyle = ExcelSheetCellStyle(
                 ExcelSheetCellBorder(line, line, line, line),
                 ExcelSheetCellFill('solid', 'c8e6c6'),
-                ExcelSheetCellAlignment('top')
+                ExcelSheetCellAlignment('top', wrapText = True)
             )
             cell = ExcelSheetCell(value, cellStyle)
             headerCells.append(cell)
