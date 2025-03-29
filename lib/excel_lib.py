@@ -44,7 +44,13 @@ class ExcelLib():
                         dv.add(f"{alphabet}{rowIndex + 1}:{alphabet}{rowIndex + 1}")
                         ws.add_data_validation(dv)
 
+                    # ハイパーリンク
+                    if cell.hasHyperLink():
+                        ws[rowIndex + 1][cellIndex].hyperlink = cell.getHyperLink()
+
                     # 書式
+                    if not cell.hasStyle():
+                        continue
                     style = cell.getStyle()
                     alignment = style.getAlignment()
                     border = style.getBorder()
