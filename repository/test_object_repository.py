@@ -11,23 +11,9 @@ from src.test.object.preparation.test_object_preparation import TestObjectPrepar
 from src.test.perspective.test_perspective import TestPerspective
 
 class TestObjectRepository():
-    def getTestCases(self, path) -> list:
-        data = {}
-        with open(path, 'r') as file:
-            data = yaml.safe_load(file)
-
-        cases = []
-        for case in data:
-            cases.append(TestCase(
-                case['パターン'] if 'パターン' in case else '',
-                case["手順"] if "手順" in case else [],
-                case['想定結果']
-            ))
-
-        return cases
-
     def find(self, testObjectName):
-        parts = self.getTestObjectParts(f"./storage/test_object/{testObjectName}")
+        # テストケース
+        parts = self.getTestObjectParts(f"./storage/test_object/{testObjectName}/テストケース.yml")
 
         # 画面イメージ
         imagePath = f"./storage/test_object/{testObjectName}/画面イメージ.png"
@@ -56,25 +42,21 @@ class TestObjectRepository():
         return testObjects
 
     def getTestObjectParts(self, path) -> list:
-        testObjectPartPaths = glob.glob(f"{path}/*[0-9]*/*/")
-        testObjectParts = []
-        for path in testObjectPartPaths:
-            result = re.match("./storage/test_object/.+?/([0-9]+?)/(.+?)/", path)
-            name = result.group(2)
+        data = {}
+        with open(path, 'r') as file:
+            data = yaml.safe_load(file)
 
-            perspectives = self.getTestPerspectives(path)
-
-            testObjectParts.append(TestObjectPart(name, perspectives))
-        return testObjectParts
-
-    def getTestPerspectives(self, testObjectPartPath) -> list:
-        testPerspectivePaths = glob.glob(f"{testObjectPartPath}/*.yml")
-        perspectives = []
-        for path in testPerspectivePaths:
-            result = re.match("./storage/test_object/.+/.+/.+/(.+).yml", path)
-            name = result.group(1)
-
-            cases = self.getTestCases(path)
-
-            perspectives.append(TestPerspective(name, cases))
-        return perspectives
+        elements = []
+        for _, elementName in enumerate(data):
+            perspectives = []
+            for _, perspectiveName in enumerate(data[elementName]):
+                cases = []
+                for _, case in enumerate(data[elementName][perspectiveName]):
+                    cases.append(TestCase(
+                        case['パターン'] if 'パターン' in case else '',
+                        case["手順"] if "手順" in case else [],
+                        case['想定結果']
+                    ))
+                perspectives.append(TestPerspective(perspectiveName, cases))
+            elements.append(TestObjectPart(elementName, perspectives))
+        return elements
