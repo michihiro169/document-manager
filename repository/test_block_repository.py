@@ -10,7 +10,7 @@ from src.test.object.part.test_object_part import TestObjectPart
 from src.test.object.preparation.test_object_preparation import TestObjectPreparation
 from src.test.perspective.test_perspective import TestPerspective
 
-class TestObjectRepository():
+class TestBlockRepository():
     def find(self, testObjectName):
         # テストケース
         parts = self.getTestObjectParts(f"./storage/test_object/{testObjectName}/テストケース.yml")
