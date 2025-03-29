@@ -1,4 +1,4 @@
-class TestObjectElement():
+class TestBlockElement():
     def __init__(self, name, perspectives) -> None:
         self.name = name
         self.perspectives = perspectives

@@ -1,7 +1,7 @@
 import yaml
 from src.test.case.test_case import TestCase
 from src.test.config.test_config import TestConfig
-from src.test.object.part.test_object_part import TestObjectPart
+from src.test.block.element.test_block_element import TestBlockElement
 from src.test.perspective.test_perspective import TestPerspective
 
 class TestConfigRepository():
@@ -20,7 +20,7 @@ class TestConfigRepository():
                     case['想定結果']
                 ))
             perspectives.append(TestPerspective(perspectiveName, cases))
-        objectPart = TestObjectPart("共通", perspectives)
+        objectPart = TestBlockElement("共通", perspectives)
 
         # テスト観点
         perspectives = None

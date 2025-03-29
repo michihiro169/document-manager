@@ -1,4 +1,4 @@
-class TestObject():
+class TestBlock():
     def __init__(self, name, parts, image=None, preparation=None) -> None:
         self.name = name
         self.parts = parts

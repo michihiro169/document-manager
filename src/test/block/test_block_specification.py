@@ -141,19 +141,19 @@ class TestObjectSpecification():
         parts = [testConfig.getTestObjectPart()] + testObject.getParts()
 
         # テストオブジェクトのテストケース行の作成
-        for partIndex, part in enumerate(parts):
-            for perspectiveIndex, perspective in enumerate(part.getPerspectives()):
+        for partIndex, element in enumerate(parts):
+            for perspectiveIndex, perspective in enumerate(element.getPerspectives()):
                 for caseIndex, case in enumerate(perspective.getCases()):
                     # 部品名、テスト観点が同じか
                     isPartTop = perspectiveIndex == 0 and caseIndex == 0
-                    isPartLast = perspectiveIndex == len(part.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
+                    isPartLast = perspectiveIndex == len(element.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
                     isPerspectiveTop = caseIndex == 0
                     isPerspectiveLast = caseIndex == len(perspective.getCases()) - 1
 
                     # IDセル
                     IdCell = cls.toCell("=ROW()-1")
                     # 部品セル
-                    partCell = cls.toCell(part.getName(), isPartTop, isPartLast)
+                    partCell = cls.toCell(element.getName(), isPartTop, isPartLast)
                     # テスト観点セル
                     perspectiveCell = cls.toCell(
                         perspective.getName(),
