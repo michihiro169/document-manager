@@ -5,43 +5,43 @@ import yaml
 from PIL import Image
 from src.test.case.test_case import TestCase
 from src.test.block.test_block import TestBlock
-from src.test.block.image.test_object_image import TestObjectImage
+from src.test.block.image.test_block_image import TestBlockImage
 from src.test.block.element.test_block_element import TestBlockElement
-from src.test.block.preparation.test_object_preparation import TestObjectPreparation
+from src.test.block.preparation.test_block_preparation import TestBlockPreparation
 from src.test.perspective.test_perspective import TestPerspective
 
 class TestBlockRepository():
-    def find(self, testObjectName):
+    def find(self, testBlockName):
         # テストケース
-        parts = self.getTestObjectParts(f"./storage/test_block/{testObjectName}/テストケース.yml")
+        elements = self.getTestBlockElements(f"./storage/test_block/{testBlockName}/テストケース.yml")
 
         # 画面イメージ
-        imagePath = f"./storage/test_block/{testObjectName}/画面イメージ.png"
+        imagePath = f"./storage/test_block/{testBlockName}/画面イメージ.png"
         image = None
         if os.path.isfile(imagePath):
             img = Image.open(imagePath)
             w, h = img.size
-            image = TestObjectImage(imagePath, w, h)
+            image = TestBlockImage(imagePath, w, h)
 
         # 事前準備
-        preparationPath = f"./storage/test_block/{testObjectName}/事前準備・注意点.yml"
+        preparationPath = f"./storage/test_block/{testBlockName}/事前準備・注意点.yml"
         preparation = None
         if os.path.isfile(preparationPath):
             with open(preparationPath, 'r') as file:
-                preparation = TestObjectPreparation(yaml.safe_load(file))
+                preparation = TestBlockPreparation(yaml.safe_load(file))
 
-        return TestBlock(testObjectName, parts, image, preparation)
+        return TestBlock(testBlockName, elements, image, preparation)
 
     def get(self) -> list:
-        testObjectPaths = glob.glob("./storage/test_block/*/")
-        testObjects = []
-        for path in testObjectPaths:
+        testBlockPaths = glob.glob("./storage/test_block/*/")
+        testBlocks = []
+        for path in testBlockPaths:
             result = re.match(r"./storage/test_block/(.+)/", path)
             name = result.group(1)
-            testObjects.append(self.find(name))
-        return testObjects
+            testBlocks.append(self.find(name))
+        return testBlocks
 
-    def getTestObjectParts(self, path) -> list:
+    def getTestBlockElements(self, path) -> list:
         data = {}
         with open(path, 'r') as file:
             data = yaml.safe_load(file)

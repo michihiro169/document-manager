@@ -1,4 +1,4 @@
-class TestObjectPreparation():
+class TestBlockPreparation():
     def __init__(self, list) -> None:
         self.list = list
 

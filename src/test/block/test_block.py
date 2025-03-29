@@ -1,7 +1,7 @@
 class TestBlock():
-    def __init__(self, name, parts, image=None, preparation=None) -> None:
+    def __init__(self, name, elements, image=None, preparation=None) -> None:
         self.name = name
-        self.parts = parts
+        self.elements = elements
         self.image = image
         self.preparation = preparation
 
@@ -11,8 +11,8 @@ class TestBlock():
     def getName(self) -> str:
         return self.name
     
-    def getParts(self) -> list:
-        return self.parts
+    def getElements(self) -> list:
+        return self.elements
 
     def getPreparation(self):
         return self.preparation

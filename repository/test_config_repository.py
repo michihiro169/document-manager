@@ -20,11 +20,11 @@ class TestConfigRepository():
                     case['想定結果']
                 ))
             perspectives.append(TestPerspective(perspectiveName, cases))
-        objectPart = TestBlockElement("共通", perspectives)
+        blockElements = TestBlockElement("共通", perspectives)
 
         # テスト観点
         perspectives = None
         with open("./storage/test_config/テスト観点.yml", 'r') as file:
             perspectives = yaml.safe_load(file)
 
-        return TestConfig(objectPart, perspectives)
+        return TestConfig(blockElements, perspectives)

@@ -1,4 +1,4 @@
-class TestObjectImage():
+class TestBlockImage():
     def __init__(self, path, width, height) -> None:
         self.path = path
         self.width = width

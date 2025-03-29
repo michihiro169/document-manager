@@ -1,10 +1,10 @@
 class TestConfig():
-    def __init__(self, testObjectPart, perspectives) -> None:
-        self.testObjectPart = testObjectPart
+    def __init__(self, testBlockElement, perspectives) -> None:
+        self.testBlockElement = testBlockElement
         self.perspectives = perspectives
 
-    def getTestObjectPart(self):
-        return self.testObjectPart
+    def getTestBlockElement(self):
+        return self.testBlockElement
 
     def getPerspectives(self) -> list:
         return self.perspectives
