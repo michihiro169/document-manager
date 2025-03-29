@@ -28,7 +28,8 @@ class TestBlockRepository():
         preparation = None
         if os.path.isfile(preparationPath):
             with open(preparationPath, 'r') as file:
-                preparation = TestBlockPreparation(yaml.safe_load(file))
+                data = yaml.safe_load(file)
+                preparation = TestBlockPreparation([] if data == None else data)
 
         return TestBlock(testBlockName, elements, image, preparation)
 

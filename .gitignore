@@ -5,6 +5,10 @@ storage/schedule_config/*
 !storage/schedule_config/休日.yml.example
 !storage/schedule_config/施策.yml.example
 
+storage/test_config/*
+!storage/test_config/テスト観点.yml.example
+!storage/test_config/共通.yml.example
+
 __pycache__
 
 build
