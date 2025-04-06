@@ -10,5 +10,3 @@ storage/test_config/*
 !storage/test_config/共通.yml.example
 
 __pycache__
-
-build
