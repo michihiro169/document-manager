@@ -1,4 +1,5 @@
 from src.excel.excel import Excel
+from src.excel.excel_specification import ExcelSpecification
 from src.excel.sheet.excel_sheet import ExcelSheet
 from src.excel.sheet.auto_filter.excel_sheet_auto_filter import ExcelSheetAutoFilter
 from src.excel.sheet.cell.excel_sheet_cell import ExcelSheetCell
@@ -153,7 +154,8 @@ class ScheduleSpecification():
     @classmethod
     def createSheetSchedule(cls, schedule, config):
         # シート行の作成
-        sheetRows = cls.createSheetScheduleHeader(config)
+        sheetHeaders = cls.createSheetScheduleHeader(config)
+        sheetRows = sheetHeaders
 
         # チケット別、フェーズ別の作業行を作成
         for _, ticket in enumerate(schedule.getTickets()):
@@ -212,11 +214,14 @@ class ScheduleSpecification():
         # 列幅
         widths = [4, 22, 22, 22, 7, 7, 11, 10]
 
+        # オートフィルタの長さ
+        autoFilterEndAlpha = ExcelSpecification.getAlphabet(len(sheetHeaders[0]) - 1)
+
         return ExcelSheet(
             "作業リスト",
             sheetRows,
             widths,
-            ExcelSheetAutoFilter('A2:N2')
+            ExcelSheetAutoFilter(f"A2:{autoFilterEndAlpha}2")
         )
 
     # 作業リストシートのヘッダ作成
@@ -239,7 +244,7 @@ class ScheduleSpecification():
 
         # ヘッダの値にサポート追加
         members = config.getMembers()
-        if len(members) > 1:
+        if len(members) > 0:
             for i, member in enumerate(members):
                 values[0].append({
                     'value': 'サポート' if i == 0 else '',
