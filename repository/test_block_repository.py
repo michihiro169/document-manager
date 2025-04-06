@@ -2,6 +2,7 @@ import glob
 import os
 import re
 import yaml
+from jinja2 import Template
 from PIL import Image
 from src.test.case.test_case import TestCase
 from src.test.block.test_block import TestBlock
@@ -43,9 +44,12 @@ class TestBlockRepository():
         return testBlocks
 
     def getTestBlockElements(self, path) -> list:
-        data = {}
+        output = ''
         with open(path, 'r') as file:
-            data = yaml.safe_load(file)
+            template = Template(file.read())
+            output = template.render()
+
+        data = yaml.safe_load(output)
 
         elements = []
         for _, elementName in enumerate(data):

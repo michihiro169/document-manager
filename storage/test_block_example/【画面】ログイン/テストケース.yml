@@ -4,9 +4,11 @@
       想定結果:
         - 【コンポーネント】ログインフォームの実施結果が全て○であること
 
-コピーライト:
+{% for i in range(2) %}
+コピーライト{{ i }}行目:
   表示文言確認:
     - パターン: '-'
       想定結果:
         - 下記であること
-        - © 2025 Example Inc. All rights reserved.
+        - © 2025 Example {{ i }} Inc. All rights reserved.
+{% endfor %}
