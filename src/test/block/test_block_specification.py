@@ -27,15 +27,15 @@ class TestBlockSpecification():
     @classmethod
     def createStatusSheet(cls):
         values = [
-            ["テストケース総数", f"=MAX(テストケース!A:A)"],
-            ["実施予定数", f'=B1 - COUNTIF(テストケース!H:H,"-")'],
-            ["正常数", f'=COUNTIF(テストケース!H:H,"○")'],
-            ["エラー数", f'=COUNTIF(テストケース!H:H,"×")'],
-            ["進捗率", "=B3/B2"],
+            ['テストケース数', f"=MAX(テストケース!A:A)"],
+            ['実施予定数', f'=B1 - COUNTIF(テストケース!H:H,"-")'],
+            ['正常数', f'=COUNTIF(テストケース!H:H,"○")'],
+            ['エラー数', f'=COUNTIF(テストケース!H:H,"×")'],
+            ['進捗率', '=B3/B2'],
         ]
 
         # 行作成
-        rows = []
+        rows = [[ExcelSheetCell('{環境名}')]]
         for _, row in enumerate(values):
             cells = []
             for cellIndex, cell in enumerate(row):
@@ -50,7 +50,7 @@ class TestBlockSpecification():
             rows.append(cells)
 
         # 列幅
-        widths = [16, 8]
+        widths = [14, 8]
 
         return ExcelSheet("実施状況", rows, widths)
 
@@ -89,7 +89,7 @@ class TestBlockSpecification():
                 for caseIndex, case in enumerate(perspective.getCases()):
                     testCaseCount += 1
 
-                    # 部品名、テスト観点が同じか
+                    # 要素名、テスト観点が同じか
                     isElementTop = perspectiveIndex == 0 and caseIndex == 0
                     isElementLast = perspectiveIndex == len(element.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
                     isPerspectiveTop = caseIndex == 0
@@ -97,7 +97,7 @@ class TestBlockSpecification():
 
                     # IDセル
                     IdCell = cls.toCell("=ROW()-1")
-                    # 部品セル
+                    # 要素セル
                     elementCell = cls.toCell(element.getName(), isElementTop, isElementLast)
                     # テスト観点セル
                     perspectiveCell = cls.toCell(
@@ -112,17 +112,15 @@ class TestBlockSpecification():
                     # 手順セル
                     procedures = ['・' + procedure for procedure in case.getProcedures()]
                     procedureCell = cls.toCell(
-                        "\r\n".join(procedures + ['・結果をエビデンスシートに記載'] if case.needsEvidence else procedures),
-                        fontColor = '0000ff' if case.needsEvidence else None,
+                        "\r\n".join(procedures + ['・結果をエビデンスシートに記載(クリックで記載場所へ)'] if case.needsEvidence else procedures),
                         wrapText  = True,
                         hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
                     )
                     if case.needsEvidence:
-                        value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()])
+                        value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()]) + '(クリックでテストケースへ)'
                         evidenceSheetRows.append([ExcelSheetCell(
                             value,
-                            style     = ExcelSheetCellStyle(font = ExcelSheetCellFont('0000ff')),
-                            hyperLink = f"#テストケース!A{testCaseCount + headerLen}"
+                            hyperLink = f"#テストケース!E{testCaseCount + headerLen}"
                         )])
 
                         for _ in range(evidenceSheetRowLen - 1):
@@ -154,7 +152,7 @@ class TestBlockSpecification():
                     ])
 
         # 列幅
-        widths = [5, 16, 15, 16, 40, 40, 11, 9, 9, 40]
+        widths = [5, 16, 18, 16, 46, 40, 11, 9, 9, 40]
 
         return [
             ExcelSheet(
@@ -170,7 +168,7 @@ class TestBlockSpecification():
     def createTestCaseSheetHeaderCells(cls):
         headerValues = [
             "ID",
-            "部品名",
+            "要素名",
             "テスト観点",
             "テストパターン",
             "手順",
