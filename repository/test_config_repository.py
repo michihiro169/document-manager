@@ -18,7 +18,7 @@ class TestConfigRepository():
                     case['パターン'],
                     case['手順'],
                     case['想定結果'],
-                    case['エビデンス'] if 'エビデンス' in case else False
+                    case['エビデンス'] if 'エビデンス' in case and case['エビデンス'] == '要' else False
                 ))
             perspectives.append(TestPerspective(perspectiveName, cases))
         blockElements = TestBlockElement("共通", perspectives)
