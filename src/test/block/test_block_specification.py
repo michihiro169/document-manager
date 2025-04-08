@@ -96,22 +96,22 @@ class TestBlockSpecification():
                     isPerspectiveLast = caseIndex == len(perspective.getCases()) - 1
 
                     # IDセル
-                    IdCell = cls.toCell("=ROW()-1")
+                    IdCell = cls.createTestCaseCell("=ROW()-1")
                     # 要素セル
-                    elementCell = cls.toCell(element.getName(), isElementTop, isElementLast)
+                    elementCell = cls.createTestCaseCell(element.getName(), isElementTop, isElementLast)
                     # テスト観点セル
-                    perspectiveCell = cls.toCell(
+                    perspectiveCell = cls.createTestCaseCell(
                         perspective.getName(),
                         isPerspectiveTop,
                         isPerspectiveLast,
                         list(testConfig.getPerspectives().keys())
                     )
                     # テストパターンセル
-                    patternCell = cls.toCell(case.getPattern())
+                    patternCell = cls.createTestCaseCell(case.getPattern())
 
                     # 手順セル
                     procedures = ['・' + procedure for procedure in case.getProcedures()]
-                    procedureCell = cls.toCell(
+                    procedureCell = cls.createTestCaseCell(
                         "\r\n".join(procedures + ['・結果をエビデンスシートに記載(クリックで記載場所へ)'] if case.needsEvidence else procedures),
                         wrapText  = True,
                         hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
@@ -128,15 +128,15 @@ class TestBlockSpecification():
                         evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
 
                     # 想定結果セル
-                    forecastCell = cls.toCell(
+                    forecastCell = cls.createTestCaseCell(
                         "\r\n".join(['・' + forecast for forecast in case.getForecasts()]),
                         wrapText = True
                     )
                     # 実施結果、実施日、実施者、備考セル
-                    resultCell = cls.toCell(validationData = ["○", "×", "-"])
-                    dateCell = cls.toCell()
-                    personCell = cls.toCell()
-                    remarkCell = cls.toCell()
+                    resultCell = cls.createTestCaseCell(validationData = ["○", "×", "-"])
+                    dateCell = cls.createTestCaseCell()
+                    personCell = cls.createTestCaseCell()
+                    remarkCell = cls.createTestCaseCell()
 
                     testCaseSheetRows.append([
                         IdCell,
@@ -192,7 +192,7 @@ class TestBlockSpecification():
         return headerCells
 
     @classmethod
-    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, fontColor = '000000', wrapText = False, hyperLink=None):
+    def createTestCaseCell(cls, value = "", isTop = True, isBottom = True, validationData = None, fontColor = '000000', wrapText = False, hyperLink=None):
         line = ExcelSheetCellLine('thin', '000000')
         return ExcelSheetCell(
             value,
