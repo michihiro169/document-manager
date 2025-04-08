@@ -27,15 +27,15 @@ class TestBlockSpecification():
     @classmethod
     def createStatusSheet(cls):
         values = [
-            ["テストケース総数", f"=MAX(テストケース!A:A)"],
-            ["実施予定数", f'=B1 - COUNTIF(テストケース!H:H,"-")'],
-            ["正常数", f'=COUNTIF(テストケース!H:H,"○")'],
-            ["エラー数", f'=COUNTIF(テストケース!H:H,"×")'],
-            ["進捗率", "=B3/B2"],
+            ['テストケース数', f"=MAX(テストケース!A:A)"],
+            ['実施予定数', f'=B1 - COUNTIF(テストケース!H:H,"-")'],
+            ['正常数', f'=COUNTIF(テストケース!H:H,"○")'],
+            ['エラー数', f'=COUNTIF(テストケース!H:H,"×")'],
+            ['進捗率', '=B3/B2'],
         ]
 
         # 行作成
-        rows = []
+        rows = [[ExcelSheetCell('{環境名}')]]
         for _, row in enumerate(values):
             cells = []
             for cellIndex, cell in enumerate(row):
@@ -50,7 +50,7 @@ class TestBlockSpecification():
             rows.append(cells)
 
         # 列幅
-        widths = [16, 8]
+        widths = [14, 8]
 
         return ExcelSheet("実施状況", rows, widths)
 
@@ -89,50 +89,54 @@ class TestBlockSpecification():
                 for caseIndex, case in enumerate(perspective.getCases()):
                     testCaseCount += 1
 
-                    # 部品名、テスト観点が同じか
+                    # 要素名、テスト観点が同じか
                     isElementTop = perspectiveIndex == 0 and caseIndex == 0
                     isElementLast = perspectiveIndex == len(element.getPerspectives()) - 1 and caseIndex == len(perspective.getCases()) - 1
                     isPerspectiveTop = caseIndex == 0
                     isPerspectiveLast = caseIndex == len(perspective.getCases()) - 1
 
                     # IDセル
-                    IdCell = cls.toCell("=ROW()-1")
-                    # 部品セル
-                    elementCell = cls.toCell(element.getName(), isElementTop, isElementLast)
+                    IdCell = cls.createTestCaseCell("=ROW()-1")
+                    # 要素セル
+                    elementCell = cls.createTestCaseCell(element.getName(), isElementTop, isElementLast)
                     # テスト観点セル
-                    perspectiveCell = cls.toCell(
+                    perspectiveCell = cls.createTestCaseCell(
                         perspective.getName(),
                         isPerspectiveTop,
                         isPerspectiveLast,
                         list(testConfig.getPerspectives().keys())
                     )
                     # テストパターンセル
-                    patternCell = cls.toCell(case.getPattern())
+                    patternCell = cls.createTestCaseCell(case.getPattern())
 
                     # 手順セル
                     procedures = ['・' + procedure for procedure in case.getProcedures()]
-                    procedureCell = cls.toCell(
-                        "\r\n".join(procedures + ['・結果をエビデンスシートに記載'] if case.needsEvidence else procedures),
-                        wrapText = True,
-                        hyperLink= f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
+                    procedureCell = cls.createTestCaseCell(
+                        "\r\n".join(procedures + ['・結果をエビデンスシートに記載(クリックで記載場所へ)'] if case.needsEvidence else procedures),
+                        wrapText  = True,
+                        hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
                     )
                     if case.needsEvidence:
-                        value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()])
-                        evidenceSheetRows.append([ExcelSheetCell(value, hyperLink=f"#テストケース!A{testCaseCount + headerLen}")])
+                        value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()]) + '(クリックでテストケースへ)'
+                        evidenceSheetRows.append([ExcelSheetCell(
+                            value,
+                            hyperLink = f"#テストケース!E{testCaseCount + headerLen}"
+                        )])
+
                         for _ in range(evidenceSheetRowLen - 1):
                             evidenceSheetRows.append([])
                         evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
 
                     # 想定結果セル
-                    forecastCell = cls.toCell(
+                    forecastCell = cls.createTestCaseCell(
                         "\r\n".join(['・' + forecast for forecast in case.getForecasts()]),
                         wrapText = True
                     )
                     # 実施結果、実施日、実施者、備考セル
-                    resultCell = cls.toCell(validationData = ["○", "×", "-"])
-                    dateCell = cls.toCell()
-                    personCell = cls.toCell()
-                    remarkCell = cls.toCell()
+                    resultCell = cls.createTestCaseCell(validationData = ["○", "×", "-"])
+                    dateCell = cls.createTestCaseCell()
+                    personCell = cls.createTestCaseCell()
+                    remarkCell = cls.createTestCaseCell()
 
                     testCaseSheetRows.append([
                         IdCell,
@@ -148,7 +152,7 @@ class TestBlockSpecification():
                     ])
 
         # 列幅
-        widths = [5, 16, 15, 16, 40, 40, 11, 9, 9, 40]
+        widths = [5, 16, 18, 16, 46, 40, 11, 9, 9, 40]
 
         return [
             ExcelSheet(
@@ -164,7 +168,7 @@ class TestBlockSpecification():
     def createTestCaseSheetHeaderCells(cls):
         headerValues = [
             "ID",
-            "部品名",
+            "要素名",
             "テスト観点",
             "テストパターン",
             "手順",
@@ -188,7 +192,7 @@ class TestBlockSpecification():
         return headerCells
 
     @classmethod
-    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, wrapText = False, hyperLink=None):
+    def createTestCaseCell(cls, value = "", isTop = True, isBottom = True, validationData = None, fontColor = '000000', wrapText = False, hyperLink=None):
         line = ExcelSheetCellLine('thin', '000000')
         return ExcelSheetCell(
             value,
@@ -202,7 +206,7 @@ class TestBlockSpecification():
                 ExcelSheetCellFill('solid', 'ffffff'),
                 ExcelSheetCellAlignment('top', wrapText),
                 # 白字はフィルタ用
-                ExcelSheetCellFont('000000') if isTop else ExcelSheetCellFont('ffffff'),
+                ExcelSheetCellFont(fontColor) if isTop else ExcelSheetCellFont('ffffff'),
             ),
             validationData,
             hyperLink
