@@ -113,12 +113,18 @@ class TestBlockSpecification():
                     procedures = ['・' + procedure for procedure in case.getProcedures()]
                     procedureCell = cls.toCell(
                         "\r\n".join(procedures + ['・結果をエビデンスシートに記載'] if case.needsEvidence else procedures),
-                        wrapText = True,
-                        hyperLink= f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
+                        fontColor = '0000ff' if case.needsEvidence else None,
+                        wrapText  = True,
+                        hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
                     )
                     if case.needsEvidence:
                         value = element.getName() + '/' + perspective.getName() + '/' + ''.join([forecast for forecast in case.getForecasts()])
-                        evidenceSheetRows.append([ExcelSheetCell(value, hyperLink=f"#テストケース!A{testCaseCount + headerLen}")])
+                        evidenceSheetRows.append([ExcelSheetCell(
+                            value,
+                            style     = ExcelSheetCellStyle(font = ExcelSheetCellFont('0000ff')),
+                            hyperLink = f"#テストケース!A{testCaseCount + headerLen}"
+                        )])
+
                         for _ in range(evidenceSheetRowLen - 1):
                             evidenceSheetRows.append([])
                         evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
@@ -188,7 +194,7 @@ class TestBlockSpecification():
         return headerCells
 
     @classmethod
-    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, wrapText = False, hyperLink=None):
+    def toCell(cls, value = "", isTop = True, isBottom = True, validationData = None, fontColor = '000000', wrapText = False, hyperLink=None):
         line = ExcelSheetCellLine('thin', '000000')
         return ExcelSheetCell(
             value,
@@ -202,7 +208,7 @@ class TestBlockSpecification():
                 ExcelSheetCellFill('solid', 'ffffff'),
                 ExcelSheetCellAlignment('top', wrapText),
                 # 白字はフィルタ用
-                ExcelSheetCellFont('000000') if isTop else ExcelSheetCellFont('ffffff'),
+                ExcelSheetCellFont(fontColor) if isTop else ExcelSheetCellFont('ffffff'),
             ),
             validationData,
             hyperLink
