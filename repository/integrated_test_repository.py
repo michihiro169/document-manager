@@ -7,6 +7,10 @@ from PIL import Image
 from src.integrated_test.batch.integrated_test_batch import IntegratedTestBatch
 from src.integrated_test.batch.process.integrated_test_batch_process import IntegratedTestBatchProcess
 from src.integrated_test.batch.preparation.integrated_test_batch_preparation import IntegratedTestBatchPreparation
+from src.integrated_test.file.integrated_test_file import IntegratedTestFile
+from src.integrated_test.file.image.integrated_test_file_image import IntegratedTestFileImage
+from src.integrated_test.file.block.integrated_test_file_block import IntegratedTestFileBlock
+from src.integrated_test.file.preparation.integrated_test_file_preparation import IntegratedTestFilePreparation
 from src.integrated_test.case.integrated_test_case import IntegratedTestCase
 from src.integrated_test.view.integrated_test_view import IntegratedTestView
 from src.integrated_test.view.image.integrated_test_view_image import IntegratedTestViewImage
@@ -29,6 +33,28 @@ class IntegratedTestRepository():
                 preparation = IntegratedTestBatchPreparation([] if data == None else data)
 
         return IntegratedTestBatch(name, batchProcesses, preparation)
+
+    def findFile(self, name):
+        # ファイルのテストケース
+        viewBlocks = self.getFileBlocks(f"./storage/integrated_test/file/{name}/テストケース.yml")
+
+        # ファイルのイメージ
+        imagePath = f"./storage/integrated_test/file/{name}/サンプル.png"
+        image = None
+        if os.path.isfile(imagePath):
+            img = Image.open(imagePath)
+            w, h = img.size
+            image = IntegratedTestFileImage(imagePath, w, h)
+
+        # ビューの事前準備
+        preparationPath = f"./storage/integrated_test/file/{name}/事前準備・注意点.yml"
+        preparation = None
+        if os.path.isfile(preparationPath):
+            with open(preparationPath, 'r') as file:
+                data = yaml.safe_load(file)
+                preparation = IntegratedTestFilePreparation([] if data == None else data)
+
+        return IntegratedTestFile(name, viewBlocks, image, preparation)
 
     def findView(self, name):
         # ビューのテストケース
@@ -60,7 +86,12 @@ class IntegratedTestRepository():
             name = result.group(1)
             batches.append(self.findBatch(name))
 
+        filePaths = glob.glob("./storage/integrated_test/file/*/")
         files = []
+        for path in filePaths:
+            result = re.match(r"./storage/integrated_test/file/(.+)/", path)
+            name = result.group(1)
+            files.append(self.findFile(name))
 
         viewPaths = glob.glob("./storage/integrated_test/view/*/")
         views = []
@@ -94,6 +125,30 @@ class IntegratedTestRepository():
                 perspectives.append(IntegratedTestPerspective(perspectiveName, cases))
             batchProcess.append(IntegratedTestBatchProcess(processName, perspectives))
         return batchProcess
+
+    def getFileBlocks(self, path) -> list:
+        output = ''
+        with open(path, 'r') as file:
+            template = Template(file.read())
+            output = template.render()
+
+        data = yaml.safe_load(output)
+
+        fileBlocks = []
+        for _, blockName in enumerate(data):
+            perspectives = []
+            for _, perspectiveName in enumerate(data[blockName]):
+                cases = []
+                for _, case in enumerate(data[blockName][perspectiveName]):
+                    cases.append(IntegratedTestCase(
+                        case['パターン'] if 'パターン' in case else '',
+                        case["手順"] if "手順" in case else [],
+                        case['想定結果'],
+                        case['エビデンス'] if 'エビデンス' in case and case['エビデンス'] == '要' else False
+                    ))
+                perspectives.append(IntegratedTestPerspective(perspectiveName, cases))
+            fileBlocks.append(IntegratedTestFileBlock(blockName, perspectives))
+        return fileBlocks
 
     def getViewBlocks(self, path) -> list:
         output = ''
