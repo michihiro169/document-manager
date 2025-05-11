@@ -11,10 +11,10 @@ cp ./storage/schedule/案件名.yml.example ./storage/schedule/案件名.yml
 ## テストケース
 ```bash
 # テスト観点の共通設定を作成
-cp ./storage/test_config/テスト観点.yml.example ./storage/test_config/テスト観点.yml
+cp ./storage/integrated_test/view_config/テスト観点.yml.example ./storage/integrated_test/view_config/テスト観点.yml
 
 # テストケースの共通設定を作成
-cp ./storage/test_config/共通.yml.example ./storage/test_config/共通.yml
+cp ./storage/integrated_test/view_config/共通.yml.example ./storage/integrated_test/view_config/共通.yml
 
 # その後 ./storage/integrated_test/view にテストケースを作成していく
 ```

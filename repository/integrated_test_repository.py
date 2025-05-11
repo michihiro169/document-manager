@@ -9,7 +9,7 @@ from src.integrated_test.view.integrated_test_view import IntegratedTestView
 from src.integrated_test.view.image.integrated_test_view_image import IntegratedTestViewImage
 from src.integrated_test.view.block.integrated_test_view_block import IntegratedTestViewBlock
 from src.integrated_test.view.preparation.integrated_test_view_preparation import IntegratedTestViewPreparation
-from src.integrated_test.perspective.test_perspective import TestPerspective
+from src.integrated_test.perspective.integrated_test_perspective import IntegratedTestPerspective
 
 class IntegratedTestRepository():
     def find(self, viewName):
@@ -63,6 +63,6 @@ class IntegratedTestRepository():
                         case['想定結果'],
                         case['エビデンス'] if 'エビデンス' in case and case['エビデンス'] == '要' else False
                     ))
-                perspectives.append(TestPerspective(perspectiveName, cases))
+                perspectives.append(IntegratedTestPerspective(perspectiveName, cases))
             blocks.append(IntegratedTestViewBlock(blockName, perspectives))
         return blocks

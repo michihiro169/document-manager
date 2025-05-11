@@ -1,4 +1,4 @@
-class TestPerspective():
+class IntegratedTestPerspective():
     def __init__(self, name, cases) -> None:
         self.name = name
         self.cases = cases

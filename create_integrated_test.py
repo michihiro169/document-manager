@@ -10,7 +10,7 @@ import sys
 integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
 
-integratedTestConfig = integratedTestConfigRepository.getTestConfig()
+integratedTestConfig = integratedTestConfigRepository.findTestConfig()
 integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
 
 for integratedTest in integratedTests:
