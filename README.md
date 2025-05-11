@@ -16,7 +16,7 @@ cp ./storage/test_config/テスト観点.yml.example ./storage/test_config/テ�
 # テストケースの共通設定を作成
 cp ./storage/test_config/共通.yml.example ./storage/test_config/共通.yml
 
-# その後 ./storage/test_block にテストケースを作成していく
+# その後 ./storage/integrated_test/view にテストケースを作成していく
 ```
 
 # チートシート

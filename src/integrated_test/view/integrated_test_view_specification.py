@@ -11,7 +11,7 @@ from src.excel.sheet.cell.line.excel_sheet_cell_line import ExcelSheetCellLine
 from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyle
 import datetime
 
-class TestBlockSpecification():
+class IntegratedTestViewSpecification():
     @classmethod
     def createPerspectiveSheet(cls, config):
         perspectives = config.getPerspectives()

@@ -1,8 +1,8 @@
 import yaml
-from src.test.case.test_case import TestCase
-from src.test.config.test_config import TestConfig
-from src.test.block.element.test_block_element import TestBlockElement
-from src.test.perspective.test_perspective import TestPerspective
+from src.integrated_test.case.test_case import TestCase
+from src.integrated_test.config.test_config import TestConfig
+from src.integrated_test.view.block.integrated_test_view_block import IntegratedTestViewBlock
+from src.integrated_test.perspective.test_perspective import TestPerspective
 
 class TestConfigRepository():
     def getTestConfig(self) -> TestConfig:
@@ -21,7 +21,7 @@ class TestConfigRepository():
                     case['エビデンス'] if 'エビデンス' in case and case['エビデンス'] == '要' else False
                 ))
             perspectives.append(TestPerspective(perspectiveName, cases))
-        blockElements = TestBlockElement("共通", perspectives)
+        blockElements = IntegratedTestViewBlock("共通", perspectives)
 
         # テスト観点
         perspectives = None

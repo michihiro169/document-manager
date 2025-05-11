@@ -1,4 +1,4 @@
-class TestBlock():
+class IntegratedTestView():
     def __init__(self, name, elements, image=None, preparation=None) -> None:
         self.name = name
         self.elements = elements

@@ -1,4 +1,4 @@
-class TestBlockPreparation():
+class IntegratedTestViewPreparation():
     def __init__(self, list) -> None:
         self.list = list
 

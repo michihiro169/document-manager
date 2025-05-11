@@ -1,4 +1,4 @@
-class TestBlockElement():
+class IntegratedTestViewBlock():
     def __init__(self, name, perspectives) -> None:
         self.name = name
         self.perspectives = perspectives
