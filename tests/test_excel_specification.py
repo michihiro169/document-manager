@@ -2,7 +2,7 @@ import unittest
 
 from src.excel.excel_specification import ExcelSpecification
 
-class TestExcelSpecification(unittest.TestCase):
+class TestExcelSpecification(unittest.IntegratedTestCase):
     def __init__(self, methodName: str) -> None:
         super().__init__(methodName)
 
