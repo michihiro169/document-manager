@@ -1,4 +1,4 @@
-class TestConfig():
+class IntegratedTestConfig():
     def __init__(self, testBlockElement, perspectives) -> None:
         self.testBlockElement = testBlockElement
         self.perspectives = perspectives

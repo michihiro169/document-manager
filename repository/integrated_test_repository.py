@@ -4,7 +4,7 @@ import re
 import yaml
 from jinja2 import Template
 from PIL import Image
-from src.integrated_test.case.test_case import TestCase
+from src.integrated_test.case.integrated_test_case import IntegratedTestCase
 from src.integrated_test.view.integrated_test_view import IntegratedTestView
 from src.integrated_test.view.image.integrated_test_view_image import IntegratedTestViewImage
 from src.integrated_test.view.block.integrated_test_view_block import IntegratedTestViewBlock
@@ -57,7 +57,7 @@ class IntegratedTestRepository():
             for _, perspectiveName in enumerate(data[blockName]):
                 cases = []
                 for _, case in enumerate(data[blockName][perspectiveName]):
-                    cases.append(TestCase(
+                    cases.append(IntegratedTestCase(
                         case['パターン'] if 'パターン' in case else '',
                         case["手順"] if "手順" in case else [],
                         case['想定結果'],

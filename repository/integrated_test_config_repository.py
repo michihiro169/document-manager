@@ -1,11 +1,11 @@
 import yaml
-from src.integrated_test.case.test_case import TestCase
-from src.integrated_test.config.test_config import TestConfig
+from src.integrated_test.case.integrated_test_case import IntegratedTestCase
+from src.integrated_test.config.integrated_test_config import IntegratedTestConfig
 from src.integrated_test.view.block.integrated_test_view_block import IntegratedTestViewBlock
 from src.integrated_test.perspective.integrated_test_perspective import IntegratedTestPerspective
 
 class IntegratedTestConfigRepository():
-    def findTestConfig(self) -> TestConfig:
+    def findTestConfig(self) -> IntegratedTestConfig:
         data = {}
         with open("./storage/integrated_test/view_config/共通.yml", 'r') as file:
             data = yaml.safe_load(file)
@@ -14,7 +14,7 @@ class IntegratedTestConfigRepository():
         for perspectiveName in data:
             cases = []
             for case in data[perspectiveName]:
-                cases.append(TestCase(
+                cases.append(IntegratedTestCase(
                     case['パターン'],
                     case['手順'],
                     case['想定結果'],
@@ -28,4 +28,4 @@ class IntegratedTestConfigRepository():
         with open("./storage/integrated_test/view_config/テスト観点.yml", 'r') as file:
             perspectives = yaml.safe_load(file)
 
-        return TestConfig(blocks, perspectives)
+        return IntegratedTestConfig(blocks, perspectives)

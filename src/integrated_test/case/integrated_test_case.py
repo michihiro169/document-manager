@@ -1,4 +1,4 @@
-class TestCase():
+class IntegratedTestCase():
     def __init__(self, pattern, procedures, forecast, needsEvidence=True) -> None:
         self.forecast = forecast
         self.pattern = pattern
