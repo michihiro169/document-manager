@@ -1,6 +1,7 @@
 from lib.excel_lib import ExcelLib
 from repository.integrated_test_config_repository import IntegratedTestConfigRepository
 from repository.integrated_test_repository import IntegratedTestRepository
+from src.integrated_test.batch.integrated_test_batch_specification import IntegratedTestBatchSpecification
 from src.integrated_test.view.integrated_test_view_specification import IntegratedTestViewSpecification
 import sys
 
@@ -15,6 +16,10 @@ integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [int
 
 for integratedTest in integratedTests.getViews():
     print(f"{integratedTest.getName()} 作成中...")
-
     excel = IntegratedTestViewSpecification.toExcel(integratedTest, integratedTestConfig.getView())
+    ExcelLib.save(excel)
+
+for integratedTest in integratedTests.getBatches():
+    print(f"{integratedTest.getName()} 作成中...")
+    excel = IntegratedTestBatchSpecification.toExcel(integratedTest, integratedTestConfig.getBatch())
     ExcelLib.save(excel)

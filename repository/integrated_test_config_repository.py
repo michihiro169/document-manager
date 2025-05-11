@@ -56,7 +56,7 @@ class IntegratedTestConfigRepository():
             viewPerspectives = yaml.safe_load(file)
 
         return IntegratedTestConfig(
-            IntegratedTestBatchConfig(process, processPerspectives),
+            IntegratedTestBatchConfig(process, batchPerspectives),
             file,
             IntegratedTestViewConfig(block, viewPerspectives)
         )

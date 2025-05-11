@@ -6,7 +6,7 @@ class IntegratedTestBatch():
 
     def getName(self) -> str:
         return self.name
-    
+
     def getProcesses(self) -> list:
         return self.processes
 

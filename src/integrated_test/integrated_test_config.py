@@ -4,7 +4,7 @@ class IntegratedTestConfig():
         self.file = file
         self.view = view
 
-    def getBatche(self):
+    def getBatch(self):
         return self.batch
 
     def getFile(self):
