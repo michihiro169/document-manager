@@ -1,9 +1,7 @@
 from lib.excel_lib import ExcelLib
 from repository.integrated_test_config_repository import IntegratedTestConfigRepository
 from repository.integrated_test_repository import IntegratedTestRepository
-from src.integrated_test.batch.integrated_test_batch_specification import IntegratedTestBatchSpecification
-from src.integrated_test.file.integrated_test_file_specification import IntegratedTestFileSpecification
-from src.integrated_test.view.integrated_test_view_specification import IntegratedTestViewSpecification
+from src.integrated_test.integrated_test_specification import IntegratedTestSpecification
 import sys
 
 # 結合テスト仕様書を生成する
@@ -12,20 +10,29 @@ import sys
 integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
 
-integratedTestConfig = integratedTestConfigRepository.findConfig()
+integratedTestConfig = integratedTestConfigRepository.find()
 integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
 
 for integratedTest in integratedTests.getBatches():
-    print(f"{integratedTest.getName()} 作成中...")
-    excel = IntegratedTestBatchSpecification.toExcel(integratedTest, integratedTestConfig.getBatch())
+    prefix = '【バッチ処理】'
+    print(f"{prefix}{integratedTest.getName()} 作成中...")
+    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getBatch(), prefix)
+    ExcelLib.save(excel)
+
+for integratedTest in integratedTests.getComponents():
+    prefix = '【コンポーネント】'
+    print(f"{prefix}{integratedTest.getName()} 作成中...")
+    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getComponent(), prefix)
     ExcelLib.save(excel)
 
 for integratedTest in integratedTests.getFiles():
-    print(f"{integratedTest.getName()} 作成中...")
-    excel = IntegratedTestFileSpecification.toExcel(integratedTest, integratedTestConfig.getFile())
+    prefix = '【ファイル】'
+    print(f"{prefix}{integratedTest.getName()} 作成中...")
+    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getFile(), prefix)
     ExcelLib.save(excel)
 
 for integratedTest in integratedTests.getViews():
-    print(f"{integratedTest.getName()} 作成中...")
-    excel = IntegratedTestViewSpecification.toExcel(integratedTest, integratedTestConfig.getView())
+    prefix = '【画面】'
+    print(f"{prefix}{integratedTest.getName()} 作成中...")
+    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getView(), prefix)
     ExcelLib.save(excel)
