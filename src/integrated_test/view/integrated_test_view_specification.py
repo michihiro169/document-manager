@@ -77,7 +77,7 @@ class IntegratedTestViewSpecification():
         evidenceSheetRows = []
 
         # テストオブジェクトと共通のテストを結合
-        elements = [testConfig.getTestBlockElement()] + testBlock.getElements()
+        elements = [testConfig.getTestBlock()] + testBlock.getBlocks()
 
         # テストオブジェクトのテストケース行の作成
         headerLen = len(testCaseSheetRows)

@@ -10,11 +10,11 @@ import sys
 integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
 
-integratedTestConfig = integratedTestConfigRepository.findTestConfig()
+integratedTestConfig = integratedTestConfigRepository.findConfig()
 integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
 
-for integratedTest in integratedTests:
+for integratedTest in integratedTests.getViews():
     print(f"{integratedTest.getName()} 作成中...")
 
-    excel = IntegratedTestViewSpecification.toExcel(integratedTest, integratedTestConfig)
+    excel = IntegratedTestViewSpecification.toExcel(integratedTest, integratedTestConfig.getView())
     ExcelLib.save(excel)

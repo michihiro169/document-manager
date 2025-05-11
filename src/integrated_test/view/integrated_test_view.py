@@ -1,7 +1,7 @@
 class IntegratedTestView():
-    def __init__(self, name, elements, image=None, preparation=None) -> None:
+    def __init__(self, name, blocks, image=None, preparation=None) -> None:
         self.name = name
-        self.elements = elements
+        self.blocks = blocks
         self.image = image
         self.preparation = preparation
 
@@ -11,8 +11,8 @@ class IntegratedTestView():
     def getName(self) -> str:
         return self.name
     
-    def getElements(self) -> list:
-        return self.elements
+    def getBlocks(self) -> list:
+        return self.blocks
 
     def getPreparation(self):
         return self.preparation
