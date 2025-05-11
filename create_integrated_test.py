@@ -1,20 +1,20 @@
 from lib.excel_lib import ExcelLib
-from repository.test_config_repository import TestConfigRepository
-from repository.test_block_repository import IntegratedTestRepository
+from repository.integrated_test_config_repository import IntegratedTestConfigRepository
+from repository.integrated_test_repository import IntegratedTestRepository
 from src.integrated_test.view.integrated_test_view_specification import IntegratedTestViewSpecification
 import sys
 
 # 結合テスト仕様書を生成する
 # コントローラー兼アプリケーションルール
 
-testConfigRepository = TestConfigRepository()
-testBlockRepository = IntegratedTestRepository()
+integratedTestConfigRepository = IntegratedTestConfigRepository()
+integratedTestRepository = IntegratedTestRepository()
 
-testConfig = testConfigRepository.getTestConfig()
-testBlocks = testBlockRepository.get() if len(sys.argv) == 1 else [testBlockRepository.find(sys.argv[1])]
+integratedTestConfig = integratedTestConfigRepository.getTestConfig()
+integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
 
-for testBlock in testBlocks:
-    print(f"{testBlock.getName()} 作成中...")
+for integratedTest in integratedTests:
+    print(f"{integratedTest.getName()} 作成中...")
 
-    excel = IntegratedTestViewSpecification.toExcel(testBlock, testConfig)
+    excel = IntegratedTestViewSpecification.toExcel(integratedTest, integratedTestConfig)
     ExcelLib.save(excel)

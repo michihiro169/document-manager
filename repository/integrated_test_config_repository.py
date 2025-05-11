@@ -4,7 +4,7 @@ from src.integrated_test.config.test_config import TestConfig
 from src.integrated_test.view.block.integrated_test_view_block import IntegratedTestViewBlock
 from src.integrated_test.perspective.test_perspective import TestPerspective
 
-class TestConfigRepository():
+class IntegratedTestConfigRepository():
     def getTestConfig(self) -> TestConfig:
         data = {}
         with open("./storage/test_config/共通.yml", 'r') as file:
