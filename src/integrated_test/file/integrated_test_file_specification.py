@@ -9,7 +9,6 @@ from src.excel.sheet.cell.font.excel_sheet_cell_font import ExcelSheetCellFont
 from src.excel.sheet.image.excel_sheet_image import ExcelSheetImage
 from src.excel.sheet.cell.line.excel_sheet_cell_line import ExcelSheetCellLine
 from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyle
-import datetime
 
 class IntegratedTestFileSpecification():
     @classmethod
@@ -215,7 +214,6 @@ class IntegratedTestFileSpecification():
     @classmethod
     def toExcel(cls, testBlock, testConfig):
         testBlockName = testBlock.getName()
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
 
         sheets = [
             cls.createStatusSheet()
@@ -234,6 +232,6 @@ class IntegratedTestFileSpecification():
         sheets.append(cls.createPerspectiveSheet(testConfig))
 
         return Excel(
-            f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
+            f"結合テスト仕様書_{testBlockName}.xlsx",
             sheets
         )

@@ -8,7 +8,6 @@ from src.excel.sheet.cell.fill.excel_sheet_cell_fill import ExcelSheetCellFill
 from src.excel.sheet.cell.font.excel_sheet_cell_font import ExcelSheetCellFont
 from src.excel.sheet.cell.line.excel_sheet_cell_line import ExcelSheetCellLine
 from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyle
-import datetime
 
 class IntegratedTestBatchSpecification():
     @classmethod
@@ -214,7 +213,6 @@ class IntegratedTestBatchSpecification():
     @classmethod
     def toExcel(cls, testBlock, testConfig):
         testBlockName = testBlock.getName()
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d')
 
         sheets = [
             cls.createStatusSheet()
@@ -225,6 +223,6 @@ class IntegratedTestBatchSpecification():
         sheets.append(cls.createPerspectiveSheet(testConfig))
 
         return Excel(
-            f"結合テスト仕様書_{testBlockName}_{timestamp}.xlsx",
+            f"結合テスト仕様書_{testBlockName}.xlsx",
             sheets
         )
