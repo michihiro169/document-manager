@@ -1,9 +1,13 @@
 class IntegratedTestBatch():
-    def __init__(self, name, blocks, image=None, preparation=None) -> None:
+    def __init__(self, name, blocks, image=None, preparation=None, accounts=[]) -> None:
         self.name = name
         self.blocks = blocks
         self.image = image
         self.preparation = preparation
+        self.accounts = accounts
+
+    def getAccounts(self) -> list:
+        return self.accounts
 
     def getImage(self) -> str:
         return self.image

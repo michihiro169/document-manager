@@ -12,6 +12,21 @@ from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyl
 
 class IntegratedTestSpecification():
     @classmethod
+    def createAccountSheet(cls, accounts):
+        rows = []
+        for account in accounts:
+            rows.append([
+                ExcelSheetCell(account.getName())
+            ])
+            for config in account.getConfigs():
+                rows.append([
+                    ExcelSheetCell(config.getKey()),
+                    ExcelSheetCell(config.getValue())
+                ])
+            rows.append([ExcelSheetCell('')])
+        return ExcelSheet("テストアカウント", rows)
+
+    @classmethod
     def createPerspectiveSheet(cls, config):
         perspectives = config.getPerspectives()
         rows = []
@@ -228,6 +243,7 @@ class IntegratedTestSpecification():
             sheets.append(ExcelSheet("画面イメージ", images=[image]))
 
         sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
+        sheets.append(cls.createAccountSheet(testBlock.getAccounts()))
         sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
         sheets.append(cls.createPerspectiveSheet(testConfig))
 
