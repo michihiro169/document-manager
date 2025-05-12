@@ -4,6 +4,8 @@ import re
 import yaml
 from jinja2 import Template
 from PIL import Image
+from src.integrated_test.account.integrated_test_account import IntegratedTestAccount
+from src.integrated_test.account.integrated_test_account_config import IntegratedTestAccountConfig
 from src.integrated_test.integrated_test_batch import IntegratedTestBatch
 from src.integrated_test.integrated_test_component import IntegratedTestComponent
 from src.integrated_test.integrated_test_file import IntegratedTestFile
@@ -33,14 +35,26 @@ class IntegratedTestRepository():
                 data = yaml.safe_load(file)
                 preparation = IntegratedTestPreparation([] if data == None else data)
 
+        testAccountPath = f"./storage/integrated_test/{type}/{name}/テストアカウント.yml"
+        testAccounts = []
+        if os.path.isfile(testAccountPath):
+            data = []
+            with open(testAccountPath, 'r') as file:
+                data = yaml.safe_load(file)
+            for _, testAccountName in enumerate(data):
+                testAccounts.append(IntegratedTestAccount(
+                    testAccountName,
+                    [IntegratedTestAccountConfig(value, data[testAccountName][value]) for key, value in enumerate(data[testAccountName])]
+                ))
+
         if type == 'component':
-            return IntegratedTestComponent(name, blocks, image, preparation)
+            return IntegratedTestComponent(name, blocks, image, preparation, testAccounts)
         elif type == 'batch':
-            return IntegratedTestBatch(name, blocks, image, preparation)
+            return IntegratedTestBatch(name, blocks, image, preparation, testAccounts)
         elif type == 'file':
-            return IntegratedTestFile(name, blocks, image, preparation)
+            return IntegratedTestFile(name, blocks, image, preparation, testAccounts)
         elif type == 'view':
-            return IntegratedTestView(name, blocks, image, preparation)
+            return IntegratedTestView(name, blocks, image, preparation, testAccounts)
 
     def get(self) -> list:
         testBatchs = []
