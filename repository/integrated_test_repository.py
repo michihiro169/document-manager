@@ -21,12 +21,13 @@ class IntegratedTestRepository():
     def find(self, type, name):
         blocks = self.getBlocks(f"./storage/integrated_test/{type}/{name}/テストケース.yml")
 
-        imagePath = f"./storage/integrated_test/{type}/{name}/画面イメージ.png"
-        image = None
-        if os.path.isfile(imagePath):
-            img = Image.open(imagePath)
-            w, h = img.size
-            image = IntegratedTestImage(imagePath, w, h)
+        images = []
+        imagePaths = glob.glob(f"./storage/integrated_test/{type}/{name}/画面イメージ/*")
+        for imagePath in imagePaths:
+            if os.path.isfile(imagePath):
+                img = Image.open(imagePath)
+                w, h = img.size
+                images.append(IntegratedTestImage(imagePath, w, h))
 
         preparationPath = f"./storage/integrated_test/{type}/{name}/事前準備・注意点.yml"
         preparation = None
@@ -48,13 +49,13 @@ class IntegratedTestRepository():
                 ))
 
         if type == 'component':
-            return IntegratedTestComponent(name, blocks, image, preparation, testAccounts)
+            return IntegratedTestComponent(name, blocks, images, preparation, testAccounts)
         elif type == 'batch':
-            return IntegratedTestBatch(name, blocks, image, preparation, testAccounts)
+            return IntegratedTestBatch(name, blocks, images, preparation, testAccounts)
         elif type == 'file':
-            return IntegratedTestFile(name, blocks, image, preparation, testAccounts)
+            return IntegratedTestFile(name, blocks, images, preparation, testAccounts)
         elif type == 'view':
-            return IntegratedTestView(name, blocks, image, preparation, testAccounts)
+            return IntegratedTestView(name, blocks, images, preparation, testAccounts)
 
     def get(self) -> list:
         testBatchs = []
@@ -63,7 +64,7 @@ class IntegratedTestRepository():
         testViews = []
         types = ['batch', 'component', 'file', 'view']
         for type in types:
-            paths = glob.glob(f"./storage/integrated_test/{type}/*/")
+            paths = glob.glob(fr"./storage/integrated_test/{type}/*/")
             for path in paths:
                 result = re.match(fr"./storage/integrated_test/{type}/(.+)/", path)
                 name = result.group(1)

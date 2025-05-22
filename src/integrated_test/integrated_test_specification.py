@@ -1,3 +1,4 @@
+from PIL import Image
 from src.excel.excel import Excel
 from src.excel.sheet.excel_sheet import ExcelSheet
 from src.excel.sheet.cell.excel_sheet_cell import ExcelSheetCell
@@ -7,6 +8,7 @@ from src.excel.sheet.cell.border.excel_sheet_cell_border import ExcelSheetCellBo
 from src.excel.sheet.cell.fill.excel_sheet_cell_fill import ExcelSheetCellFill
 from src.excel.sheet.cell.font.excel_sheet_cell_font import ExcelSheetCellFont
 from src.excel.sheet.image.excel_sheet_image import ExcelSheetImage
+from src.excel.sheet.image.excel_sheet_image_size import ExcelSheetImageSize
 from src.excel.sheet.cell.line.excel_sheet_cell_line import ExcelSheetCellLine
 from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyle
 
@@ -42,9 +44,9 @@ class IntegratedTestSpecification():
     def createStatusSheet(cls):
         values = [
             ['テストケース数', f"=MAX(テストケース!A:A)"],
-            ['実施予定数', f'=B1 - COUNTIF(テストケース!H:H,"-")'],
-            ['正常数', f'=COUNTIF(テストケース!H:H,"○")'],
-            ['エラー数', f'=COUNTIF(テストケース!H:H,"×")'],
+            ['実施予定数', f'=B1 - COUNTIF(テストケース!G:G,"-")'],
+            ['正常数', f'=COUNTIF(テストケース!G:G,"○")'],
+            ['エラー数', f'=COUNTIF(テストケース!G:G,"×")'],
             ['進捗率', '=B3/B2'],
         ]
 
@@ -234,13 +236,19 @@ class IntegratedTestSpecification():
             cls.createStatusSheet()
         ]
 
-        if testBlock.hasImage():
-            image = ExcelSheetImage(
-                testBlock.getImage().getPath(),
-                testBlock.getImage().getWidth(),
-                testBlock.getImage().getHeight()
-            )
-            sheets.append(ExcelSheet("画面イメージ", images=[image]))
+        if testBlock.hasImages():
+            images = [ExcelSheetImage(
+                image.getPath(),
+                ExcelSheetImageSize(image.getWidth(), image.getHeight()),
+                index * 30 + 2
+            ) for index, image in enumerate(testBlock.getImages())]
+
+            rows = []
+            for index, image in enumerate(testBlock.getImages()):
+                rows.append([ExcelSheetCell(image.getName())])
+                for _ in range(29):
+                    rows.append([ExcelSheetCell('')])
+            sheets.append(ExcelSheet("画面イメージ", rows, images=images))
 
         sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
         sheets.append(cls.createAccountSheet(testBlock.getAccounts()))

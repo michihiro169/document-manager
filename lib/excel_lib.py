@@ -80,11 +80,12 @@ class ExcelLib():
                         ws[rowIndex + 1][cellIndex].font = Font(color=style.getFont().getColor())
 
             # シートの画像の処理
-            for imageIndex, image in enumerate(sheet.getImages()):
+            for _, image in enumerate(sheet.getImages()):
                 img = Image(image.getPath())
-                img.width = image.getWidth()
-                img.height = image.getHeight()
-                ws.add_image(img, f'{ExcelSpecification.getAlphabet(image.getRowIndex())}{image.getColumnIndex()}')
+                resizeImage = image.getSize().getResize(640)
+                img.width = resizeImage.getWidth()
+                img.height = resizeImage.getHeight()
+                ws.add_image(img, f'{ExcelSpecification.getAlphabet(image.getColumnIndex())}{image.getRowIndex()}')
 
         # Sheet1を削除
         sheet1 = wb.active
