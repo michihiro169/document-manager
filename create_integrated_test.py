@@ -14,25 +14,25 @@ integratedTestConfig = integratedTestConfigRepository.find()
 integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
 
 for integratedTest in integratedTests.getBatches():
-    prefix = '【バッチ処理】'
+    prefix = 'バッチ処理'
     print(f"{prefix}{integratedTest.getName()} 作成中...")
     excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getBatch(), prefix)
     ExcelLib.save(excel)
 
 for integratedTest in integratedTests.getComponents():
-    prefix = '【コンポーネント】'
+    prefix = 'コンポーネント'
     print(f"{prefix}{integratedTest.getName()} 作成中...")
     excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getComponent(), prefix)
     ExcelLib.save(excel)
 
 for integratedTest in integratedTests.getFiles():
-    prefix = '【ファイル】'
+    prefix = 'ファイル'
     print(f"{prefix}{integratedTest.getName()} 作成中...")
     excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getFile(), prefix)
     ExcelLib.save(excel)
 
 for integratedTest in integratedTests.getViews():
-    prefix = '【画面】'
+    prefix = '画面'
     print(f"{prefix}{integratedTest.getName()} 作成中...")
     excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getView(), prefix)
     ExcelLib.save(excel)

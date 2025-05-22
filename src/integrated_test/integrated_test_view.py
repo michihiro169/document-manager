@@ -1,16 +1,16 @@
 class IntegratedTestView():
-    def __init__(self, name, blocks, image=None, preparation=None, accounts=[]) -> None:
+    def __init__(self, name, blocks, images=[], preparation=None, accounts=[]) -> None:
         self.name = name
         self.blocks = blocks
-        self.image = image
+        self.images = images
         self.preparation = preparation
         self.accounts = accounts
 
     def getAccounts(self) -> list:
         return self.accounts
 
-    def getImage(self) -> str:
-        return self.image
+    def getImages(self) -> list:
+        return self.images
 
     def getName(self) -> str:
         return self.name
@@ -21,5 +21,5 @@ class IntegratedTestView():
     def getPreparation(self):
         return self.preparation
 
-    def hasImage(self) -> bool:
-        return self.image != None
+    def hasImages(self) -> bool:
+        return len(self.images) > 0
