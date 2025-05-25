@@ -1,5 +1,5 @@
 class IntegratedTestView():
-    def __init__(self, name, blocks, matrices=[], images=[], preparation=None, accounts=[]) -> None:
+    def __init__(self, name, blocks, matrices=[], images=[], preparation=None, accounts=None) -> None:
         self.name = name
         self.blocks = blocks
         self.matrices = matrices
@@ -7,7 +7,7 @@ class IntegratedTestView():
         self.preparation = preparation
         self.accounts = accounts
 
-    def getAccounts(self) -> list:
+    def getAccounts(self):
         return self.accounts
 
     def getImages(self) -> list:
@@ -27,3 +27,6 @@ class IntegratedTestView():
 
     def hasImages(self) -> bool:
         return len(self.images) > 0
+
+    def hasTestData(self) -> bool:
+        return self.accounts != None
