@@ -1,5 +1,5 @@
 class IntegratedTestComponent():
-    def __init__(self, name, blocks, matrices=[], images=[], preparation=None, accounts=[]) -> None:
+    def __init__(self, name, blocks, matrices=[], images=[], preparation=None, accounts=None) -> None:
         self.name = name
         self.blocks = blocks
         self.matrices = matrices
@@ -27,3 +27,6 @@ class IntegratedTestComponent():
 
     def hasImages(self) -> bool:
         return len(self.images) > 0
+
+    def hasTestData(self) -> bool:
+        return self.accounts != None

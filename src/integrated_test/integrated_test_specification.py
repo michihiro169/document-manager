@@ -14,19 +14,81 @@ from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyl
 
 class IntegratedTestSpecification():
     @classmethod
-    def createAccountSheet(cls, accounts):
-        rows = []
-        for account in accounts:
-            rows.append([
-                ExcelSheetCell(account.getName())
-            ])
-            for config in account.getConfigs():
-                rows.append([
-                    ExcelSheetCell(config.getKey()),
-                    ExcelSheetCell(config.getValue())
-                ])
-            rows.append([ExcelSheetCell('')])
-        return ExcelSheet("テストデータ", rows)
+    def createTestDataSheet(cls, testData):
+        # テストデータから再帰的に値を取り出す一時関数
+        def extractData(data, path=None):
+            if path is None:
+                path = []
+
+            results = []
+
+            if isinstance(data, dict):
+                for key, value in data.items():
+                    results.extend(extractData(value, path + [key]))
+            elif isinstance(data, list):
+                for index, item in enumerate(data):
+                    results.extend(extractData(item, path + [index]))
+            else:
+                results.append((path, data))
+
+            return results
+
+        # テストデータから行列データ作成
+        matrix = []
+        for keys, value in extractData(testData.getData()):
+            matrix.append(keys + [value])
+
+        # 行列データの列の長さを揃える
+        maxLen = max(len(row) for row in matrix)
+        matrix = [row[:-1] + [""] * (maxLen - len(row)) + [row[len(row) - 1]] for row in matrix]
+
+        # シートの行作成
+        sheetRows = []
+        # ヘッダ部
+        line = ExcelSheetCellLine('thin', '000000')
+        headerCells = []
+        for index in range(0, maxLen - 1):
+            headerCells.append(ExcelSheetCell(
+                f"キー{index + 1}",
+                ExcelSheetCellStyle(
+                    ExcelSheetCellBorder(line, line, line, line),
+                    fill = ExcelSheetCellFill('solid', 'c8e6c6')
+                )
+            ))
+        headerCells.append(ExcelSheetCell(
+                f"値",
+                ExcelSheetCellStyle(
+                    ExcelSheetCellBorder(line, line, line, line),
+                    fill = ExcelSheetCellFill('solid', 'c8e6c6')
+                )
+            ))
+        sheetRows.append(headerCells)
+        # データ部
+        for rowIndex, row in enumerate(matrix):
+            sheetRowCells = []
+            for cellIndex, cell in enumerate(row):
+                # パディングセルか否か
+                # オートフィルタは列方向のみのため列方向の結合の基準は空欄でいい
+                if cell == "":
+                    sheetRowCells.append(cls.createMergeCell(
+                        cell,
+                        isTop = True,
+                        isBottom = True,
+                        isRight  = cellIndex == len(matrix[rowIndex]) - 1,
+                        isLeft   = False
+                    ))
+                else:
+                    sheetRowCells.append(cls.createMergeCell(
+                        cell,
+                        isTop    = rowIndex == 0                          or matrix[rowIndex - 1][cellIndex] != cell,
+                        isBottom = (rowIndex == len(matrix) - 1)          or matrix[rowIndex + 1][cellIndex] != cell,
+                        isRight  = cellIndex == len(matrix[rowIndex]) - 1 or matrix[rowIndex][cellIndex + 1] != "",
+                        isLeft   = cellIndex == 0                         or matrix[rowIndex][cellIndex - 1] != cell
+                    ))
+            sheetRows.append(sheetRowCells)
+
+        alphabet = ExcelSpecification.getAlphabet(maxLen - 1)
+        return ExcelSheet("テストデータ", sheetRows, [30] * maxLen, ExcelSheetAutoFilter(f"A1:{alphabet}1"))
 
     @classmethod
     def createPerspectiveSheet(cls, config):
@@ -112,22 +174,22 @@ class IntegratedTestSpecification():
                     isPerspectiveLast = caseIndex == len(perspective.getCases()) - 1
 
                     # IDセル
-                    IdCell = cls.createTestCaseCell("=ROW()-1")
+                    IdCell = cls.createMergeCell("=ROW()-1")
                     # 要素セル
-                    elementCell = cls.createTestCaseCell(element.getName(), isElementTop, isElementLast)
+                    elementCell = cls.createMergeCell(element.getName(), isElementTop, isElementLast)
                     # テスト観点セル
-                    perspectiveCell = cls.createTestCaseCell(
+                    perspectiveCell = cls.createMergeCell(
                         perspective.getName(),
                         isPerspectiveTop,
                         isPerspectiveLast,
                         list(testConfig.getPerspectives().keys())
                     )
                     # テストパターンセル
-                    patternCell = cls.createTestCaseCell(case.getPattern())
+                    patternCell = cls.createMergeCell(case.getPattern())
 
                     # 手順セル
                     procedures = ['・' + procedure for procedure in case.getProcedures()]
-                    procedureCell = cls.createTestCaseCell(
+                    procedureCell = cls.createMergeCell(
                         "\r\n".join(procedures + ['・結果をエビデンスシートに記載(クリックで記載場所へ)'] if case.needsEvidence else procedures),
                         wrapText  = True,
                         hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}" if case.needsEvidence else None
@@ -144,15 +206,15 @@ class IntegratedTestSpecification():
                         evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
 
                     # 想定結果セル
-                    forecastCell = cls.createTestCaseCell(
+                    forecastCell = cls.createMergeCell(
                         "\r\n".join(['・' + forecast for forecast in case.getForecasts()]),
                         wrapText = True
                     )
                     # 実施結果、実施日、実施者、備考セル
-                    resultCell = cls.createTestCaseCell(validationData = ["○", "×", "-"])
-                    dateCell = cls.createTestCaseCell()
-                    personCell = cls.createTestCaseCell()
-                    remarkCell = cls.createTestCaseCell()
+                    resultCell = cls.createMergeCell(validationData = ["○", "×", "-"])
+                    dateCell = cls.createMergeCell()
+                    personCell = cls.createMergeCell()
+                    remarkCell = cls.createMergeCell()
 
                     testCaseSheetRows.append([
                         IdCell,
@@ -232,7 +294,7 @@ class IntegratedTestSpecification():
     def createTestCaseSheetHeaderCells(cls):
         headerValues = [
             "ID",
-            "要素名",
+            "概要",
             "テスト観点",
             "テストパターン",
             "手順",
@@ -256,7 +318,18 @@ class IntegratedTestSpecification():
         return headerCells
 
     @classmethod
-    def createTestCaseCell(cls, value = "", isTop = True, isBottom = True, validationData = None, fontColor = '000000', wrapText = False, hyperLink=None):
+    def createMergeCell(
+        cls,
+        value = "",
+        isTop = True,
+        isBottom = True,
+        isRight = True,
+        isLeft = True,
+        validationData = None,
+        fontColor = '000000',
+        wrapText = False,
+        hyperLink=None
+    ):
         line = ExcelSheetCellLine('thin', '000000')
         return ExcelSheetCell(
             value,
@@ -264,8 +337,8 @@ class IntegratedTestSpecification():
                 ExcelSheetCellBorder(
                     line if isTop else None,
                     line if isBottom else None,
-                    line,
-                    line
+                    line if isRight else None,
+                    line if isLeft else None
                 ),
                 ExcelSheetCellFill('solid', 'ffffff'),
                 ExcelSheetCellAlignment('top', wrapText),
@@ -299,7 +372,8 @@ class IntegratedTestSpecification():
             sheets.append(ExcelSheet("画面イメージ", rows, images=images))
 
         sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
-        sheets.append(cls.createAccountSheet(testBlock.getAccounts()))
+        if testBlock.hasTestData():
+            sheets.append(cls.createTestDataSheet(testBlock.getAccounts()))
         sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
         sheets.append(cls.createPerspectiveSheet(testConfig))
 
