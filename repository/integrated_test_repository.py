@@ -1,3 +1,4 @@
+import csv
 import glob
 import os
 import re
@@ -12,6 +13,7 @@ from src.integrated_test.integrated_test_file import IntegratedTestFile
 from src.integrated_test.case.integrated_test_case import IntegratedTestCase
 from src.integrated_test.integrated_test_view import IntegratedTestView
 from src.integrated_test.image.integrated_test_image import IntegratedTestImage
+from src.integrated_test.matrix.integrated_test_matrix import IntegratedTestMatrix
 from src.integrated_test.block.integrated_test_block import IntegratedTestBlock
 from src.integrated_test.preparation.integrated_test_preparation import IntegratedTestPreparation
 from src.integrated_test.perspective.integrated_test_perspective import IntegratedTestPerspective
@@ -21,8 +23,16 @@ class IntegratedTestRepository():
     def find(self, type, name):
         blocks = self.getBlocks(f"./storage/integrated_test/{type}/{name}/テストケース.yml")
 
+        matrices = []
+        matrixPaths = sorted(glob.glob(f"./storage/integrated_test/{type}/{name}/マトリクス/*"))
+        for matrixPath in matrixPaths:
+            with open(matrixPath, 'r') as file:
+                reader = csv.reader(file)
+                data = [row for row in reader]
+                matrices.append(IntegratedTestMatrix(os.path.splitext(os.path.basename(matrixPath))[0], data[0], data[1:]))
+
         images = []
-        imagePaths = glob.glob(f"./storage/integrated_test/{type}/{name}/画面イメージ/*")
+        imagePaths = sorted(glob.glob(f"./storage/integrated_test/{type}/{name}/画面イメージ/*"))
         for imagePath in imagePaths:
             if os.path.isfile(imagePath):
                 img = Image.open(imagePath)
@@ -36,7 +46,7 @@ class IntegratedTestRepository():
                 data = yaml.safe_load(file)
                 preparation = IntegratedTestPreparation([] if data == None else data)
 
-        testAccountPath = f"./storage/integrated_test/{type}/{name}/テストアカウント.yml"
+        testAccountPath = f"./storage/integrated_test/{type}/{name}/テストデータ.yml"
         testAccounts = []
         if os.path.isfile(testAccountPath):
             data = []
@@ -49,13 +59,13 @@ class IntegratedTestRepository():
                 ))
 
         if type == 'component':
-            return IntegratedTestComponent(name, blocks, images, preparation, testAccounts)
+            return IntegratedTestComponent(name, blocks, matrices, images, preparation, testAccounts)
         elif type == 'batch':
-            return IntegratedTestBatch(name, blocks, images, preparation, testAccounts)
+            return IntegratedTestBatch(name, blocks, matrices, images, preparation, testAccounts)
         elif type == 'file':
-            return IntegratedTestFile(name, blocks, images, preparation, testAccounts)
+            return IntegratedTestFile(name, blocks, matrices, images, preparation, testAccounts)
         elif type == 'view':
-            return IntegratedTestView(name, blocks, images, preparation, testAccounts)
+            return IntegratedTestView(name, blocks, matrices, images, preparation, testAccounts)
 
     def get(self) -> list:
         testBatchs = []

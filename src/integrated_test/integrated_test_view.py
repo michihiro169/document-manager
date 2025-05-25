@@ -1,7 +1,8 @@
 class IntegratedTestView():
-    def __init__(self, name, blocks, images=[], preparation=None, accounts=[]) -> None:
+    def __init__(self, name, blocks, matrices=[], images=[], preparation=None, accounts=[]) -> None:
         self.name = name
         self.blocks = blocks
+        self.matrices = matrices
         self.images = images
         self.preparation = preparation
         self.accounts = accounts
@@ -11,6 +12,9 @@ class IntegratedTestView():
 
     def getImages(self) -> list:
         return self.images
+
+    def getMatrices(self) -> list:
+        return self.matrices
 
     def getName(self) -> str:
         return self.name

@@ -1,5 +1,5 @@
-from PIL import Image
 from src.excel.excel import Excel
+from src.excel.excel_specification import ExcelSpecification
 from src.excel.sheet.excel_sheet import ExcelSheet
 from src.excel.sheet.cell.excel_sheet_cell import ExcelSheetCell
 from src.excel.sheet.auto_filter.excel_sheet_auto_filter import ExcelSheetAutoFilter
@@ -26,7 +26,7 @@ class IntegratedTestSpecification():
                     ExcelSheetCell(config.getValue())
                 ])
             rows.append([ExcelSheetCell('')])
-        return ExcelSheet("テストアカウント", rows)
+        return ExcelSheet("テストデータ", rows)
 
     @classmethod
     def createPerspectiveSheet(cls, config):
@@ -170,15 +170,63 @@ class IntegratedTestSpecification():
         # 列幅
         widths = [5, 16, 18, 16, 46, 40, 11, 9, 9, 40]
 
-        return [
-            ExcelSheet(
-                "テストケース",
-                testCaseSheetRows,
-                widths,
-                ExcelSheetAutoFilter('A1:J1')
-            ),
-            ExcelSheet("エビデンス", evidenceSheetRows)
-        ]
+        # マトリクステストシート
+        matrixSheets = []
+        for _, matrix in enumerate(testBlock.getMatrices()):
+            matrixSheetRows = []
+            evidenceIndex = matrix.getEvidenceIndex()
+
+            # ヘッダ部
+            matrixSheetRowCells = [ExcelSheetCell('No.', ExcelSheetCellStyle(
+                fill = ExcelSheetCellFill('solid', 'c8e6c6')
+            ))]
+            for _, value in enumerate(matrix.getHeader()):
+                line = ExcelSheetCellLine('thin', '000000')
+                matrixSheetRowCells.append(ExcelSheetCell(value, ExcelSheetCellStyle(
+                    ExcelSheetCellBorder(line, line, line, line),
+                    fill = ExcelSheetCellFill('solid', 'c8e6c6')
+                )))
+            matrixSheetRows.append(matrixSheetRowCells)
+
+            # データ部
+            for matrixRowIndex, matrixRow in enumerate(matrix.getData()):
+                matrixSheetRowCells = [ExcelSheetCell('=ROW()-1')]
+                for index, matrixRowValue in enumerate(matrixRow):
+                    if index == evidenceIndex and matrixRowValue == "要":
+                        matrixSheetRowCells.append(ExcelSheetCell(
+                            '要(クリックでエビデンスへ)',
+                            hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}"
+                        ))
+
+                        # エビデンスシートにマトリクステストケースへのリンクを追加
+                        # +1はNo.列を考慮
+                        alphabet = ExcelSpecification.getAlphabet(evidenceIndex + 1)
+                        evidenceSheetRows.append([ExcelSheetCell(
+                            matrix.getName() + "/No." + str(matrixRowIndex + 1) + "(クリックでマトリクスへ)",
+                            # +1はヘッダ部とインデックスが0始まりであることの考慮
+                            hyperLink = f"#{matrix.getName()}!{alphabet}{matrixRowIndex + 1 + 1}"
+                        )])
+                        for _ in range(evidenceSheetRowLen - 1):
+                            evidenceSheetRows.append([])
+
+                        evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
+                    else:
+                        matrixSheetRowCells.append(ExcelSheetCell(matrixRowValue))
+                matrixSheetRows.append(matrixSheetRowCells)
+            # オートフィルタ
+            alphabet = ExcelSpecification.getAlphabet(len(matrixSheetRows[0]) - 1)
+            matrixSheets.append(ExcelSheet(matrix.getName(), matrixSheetRows, [], ExcelSheetAutoFilter(f"A1:{alphabet}1")))
+
+        sheets = [ExcelSheet(
+            "テストケース",
+            testCaseSheetRows,
+            widths,
+            ExcelSheetAutoFilter('A1:J1')
+        )]
+        sheets = sheets + matrixSheets
+        sheets.append(ExcelSheet("エビデンス", evidenceSheetRows))
+
+        return sheets
 
     @classmethod
     def createTestCaseSheetHeaderCells(cls):
