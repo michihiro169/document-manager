@@ -1,10 +1,6 @@
 import yaml
 from src.integrated_test.case.integrated_test_case import IntegratedTestCase
 from src.integrated_test.config.integrated_test_config import IntegratedTestConfig
-# from src.integrated_test.config.integrated_test_config_batch import IntegratedTestConfigBatch
-# from src.integrated_test.config.integrated_test_config_component import IntegratedTestConfigComponent
-# from src.integrated_test.config.integrated_test_config_file import IntegratedTestConfigFile
-# from src.integrated_test.config.integrated_test_config_view import IntegratedTestConfigView
 from src.integrated_test.block.integrated_test_block import IntegratedTestBlock
 from src.integrated_test.perspective.integrated_test_perspective import IntegratedTestPerspective
 

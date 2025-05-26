@@ -23,11 +23,6 @@ class IntegratedTest():
     def getBlocks(self) -> list:
         return self.blocks
 
-    def getPrefix(self):
-
-
-        return self.preparation
-
     def getPreparation(self):
         return self.preparation
 

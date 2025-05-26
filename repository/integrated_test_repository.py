@@ -6,11 +6,7 @@ import yaml
 from jinja2 import Template
 from PIL import Image
 from src.integrated_test.data.integrated_test_data import IntegratedTestData
-# from src.integrated_test.integrated_test_batch import IntegratedTestBatch
-# from src.integrated_test.integrated_test_component import IntegratedTestComponent
-# from src.integrated_test.integrated_test_file import IntegratedTestFile
 from src.integrated_test.case.integrated_test_case import IntegratedTestCase
-# from src.integrated_test.integrated_test_view import IntegratedTestView
 from src.integrated_test.image.integrated_test_image import IntegratedTestImage
 from src.integrated_test.matrix.integrated_test_matrix import IntegratedTestMatrix
 from src.integrated_test.block.integrated_test_block import IntegratedTestBlock
