@@ -1,3 +1,9 @@
+# 推奨設定
+## git
+```bash
+git config --global core.quotepath false
+```
+
 # 使い方
 ## スケジュール
 ```bash
