@@ -10,29 +10,26 @@ import sys
 integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
 
-integratedTestConfig = integratedTestConfigRepository.find()
+integratedTestConfigs = integratedTestConfigRepository.find()
 integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
 
-for integratedTest in integratedTests.getBatches():
-    prefix = 'バッチ処理'
-    print(f"{prefix}{integratedTest.getName()} 作成中...")
-    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getBatch(), prefix)
-    ExcelLib.save(excel)
+for index, integratedTest in enumerate(integratedTests):
+    typeName = integratedTest.getType()
 
-for integratedTest in integratedTests.getComponents():
-    prefix = 'コンポーネント'
-    print(f"{prefix}{integratedTest.getName()} 作成中...")
-    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getComponent(), prefix)
-    ExcelLib.save(excel)
+    # プレフィックス作成
+    prefix = ""
+    if typeName == 'batch':
+        prefix = 'バッチ'
+    elif typeName == 'component':
+        prefix = 'コンポーネント'
+    elif typeName == 'file':
+        prefix = 'ファイル'
+    elif typeName == 'view':
+        prefix = 'ビュー'
 
-for integratedTest in integratedTests.getFiles():
-    prefix = 'ファイル'
     print(f"{prefix}{integratedTest.getName()} 作成中...")
-    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getFile(), prefix)
-    ExcelLib.save(excel)
 
-for integratedTest in integratedTests.getViews():
-    prefix = '画面'
-    print(f"{prefix}{integratedTest.getName()} 作成中...")
-    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig.getView(), prefix)
+    # 結合テスト仕様書とタイプが同じの設定を取得
+    integratedTestConfig = next((c for c in integratedTestConfigs if c.getType() == typeName), None)
+    excel = IntegratedTestSpecification.toExcel(integratedTest, integratedTestConfig, prefix)
     ExcelLib.save(excel)

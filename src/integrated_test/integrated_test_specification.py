@@ -152,13 +152,13 @@ class IntegratedTestSpecification():
         return ExcelSheet("事前準備・注意点", rows)
 
     @classmethod
-    def createTestCaseAndEvidenceSheet(cls, testBlock, testConfig):
+    def createTestCaseAndEvidenceSheet(cls, integratedTest, integratedTestConfig):
         # シート行の作成
         testCaseSheetRows = [cls.createTestCaseSheetHeaderCells()]
         evidenceSheetRows = []
 
         # テストオブジェクトと共通のテストを結合
-        elements = [testConfig.getBlock()] + testBlock.getBlocks()
+        elements = [integratedTestConfig.getBlock()] + integratedTest.getBlocks()
 
         # テストオブジェクトのテストケース行の作成
         headerLen = len(testCaseSheetRows)
@@ -185,7 +185,7 @@ class IntegratedTestSpecification():
                         perspective.getName(),
                         isPerspectiveTop,
                         isPerspectiveLast,
-                        list(testConfig.getPerspectives().keys())
+                        list(integratedTestConfig.getPerspectives().keys())
                     )
                     # テストパターンセル
                     patternCell = cls.createMergeCell(case.getPattern())
@@ -237,7 +237,7 @@ class IntegratedTestSpecification():
 
         # マトリクステストシート
         matrixSheets = []
-        for _, matrix in enumerate(testBlock.getMatrices()):
+        for _, matrix in enumerate(integratedTest.getMatrices()):
             matrixSheetRows = []
             evidenceIndex = matrix.getEvidenceIndex()
 
@@ -353,32 +353,32 @@ class IntegratedTestSpecification():
         )
 
     @classmethod
-    def toExcel(cls, testBlock, testConfig, prefix=''):
-        testBlockName = testBlock.getName()
+    def toExcel(cls, integratedTest, integratedTestConfig, prefix=''):
+        testBlockName = integratedTest.getName()
 
         sheets = [
             cls.createStatusSheet()
         ]
 
-        if testBlock.hasImages():
+        if integratedTest.hasImages():
             images = [ExcelSheetImage(
                 image.getPath(),
                 ExcelSheetImageSize(image.getWidth(), image.getHeight()),
                 index * 30 + 2
-            ) for index, image in enumerate(testBlock.getImages())]
+            ) for index, image in enumerate(integratedTest.getImages())]
 
             rows = []
-            for index, image in enumerate(testBlock.getImages()):
+            for index, image in enumerate(integratedTest.getImages()):
                 rows.append([ExcelSheetCell(image.getName())])
                 for _ in range(29):
                     rows.append([ExcelSheetCell('')])
             sheets.append(ExcelSheet("画面イメージ", rows, images=images))
 
-        sheets.append(cls.createPreparationSheet(testBlock.getPreparation()))
-        if testBlock.hasTestData():
-            sheets.append(cls.createTestDataSheet(testBlock.getAccounts()))
-        sheets = sheets + cls.createTestCaseAndEvidenceSheet(testBlock, testConfig)
-        sheets.append(cls.createPerspectiveSheet(testConfig))
+        sheets.append(cls.createPreparationSheet(integratedTest.getPreparation()))
+        if integratedTest.hasTestData():
+            sheets.append(cls.createTestDataSheet(integratedTest.getAccounts()))
+        sheets = sheets + cls.createTestCaseAndEvidenceSheet(integratedTest, integratedTestConfig)
+        sheets.append(cls.createPerspectiveSheet(integratedTestConfig))
 
         return Excel(
             f"結合テスト仕様書_{prefix}_{testBlockName}.xlsx",

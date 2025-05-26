@@ -1,18 +1,36 @@
 class IntegratedTest():
-    def __init__(self, batches=[], components=[], files=[], views=[]) -> None:
-        self.batches = batches
-        self.components = components
-        self.files = files
-        self.views = views
+    def __init__(self, type, name, blocks, matrices=[], images=[], preparation=None, accounts=None) -> None:
+        self.type = type
+        self.name = name
+        self.blocks = blocks
+        self.matrices = matrices
+        self.images = images
+        self.preparation = preparation
+        self.accounts = accounts
 
-    def getBatches(self) -> list:
-        return self.batches
+    def getAccounts(self):
+        return self.accounts
 
-    def getComponents(self) -> list:
-        return self.components
+    def getImages(self) -> list:
+        return self.images
 
-    def getFiles(self) -> list:
-        return self.files
+    def getMatrices(self) -> list:
+        return self.matrices
+
+    def getName(self) -> str:
+        return self.name
     
-    def getViews(self) -> list:
-        return self.views
+    def getBlocks(self) -> list:
+        return self.blocks
+
+    def getPreparation(self):
+        return self.preparation
+
+    def getType(self) -> str:
+        return self.type
+
+    def hasImages(self) -> bool:
+        return len(self.images) > 0
+
+    def hasTestData(self) -> bool:
+        return self.accounts != None

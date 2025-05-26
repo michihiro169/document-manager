@@ -1,23 +1,16 @@
 import yaml
 from src.integrated_test.case.integrated_test_case import IntegratedTestCase
 from src.integrated_test.config.integrated_test_config import IntegratedTestConfig
-from src.integrated_test.config.integrated_test_config_batch import IntegratedTestConfigBatch
-from src.integrated_test.config.integrated_test_config_component import IntegratedTestConfigComponent
-from src.integrated_test.config.integrated_test_config_file import IntegratedTestConfigFile
-from src.integrated_test.config.integrated_test_config_view import IntegratedTestConfigView
 from src.integrated_test.block.integrated_test_block import IntegratedTestBlock
 from src.integrated_test.perspective.integrated_test_perspective import IntegratedTestPerspective
 
 class IntegratedTestConfigRepository():
     def find(self) -> IntegratedTestConfig:
-        configBatch = None
-        configComponent = None
-        configFile = None
-        configView = None
-        types = ['component', 'batch', 'file', 'view']
-        for type in types:
+        configs = []
+        typeNames = ['component', 'batch', 'file', 'view']
+        for typeName in typeNames:
             data = {}
-            with open(f"./storage/integrated_test/{type}_config/共通.yml", 'r') as file:
+            with open(f"./storage/integrated_test/{typeName}_config/共通.yml", 'r') as file:
                 data = yaml.safe_load(file)
 
             blockPerspectives = []
@@ -35,21 +28,9 @@ class IntegratedTestConfigRepository():
             block = IntegratedTestBlock("共通", blockPerspectives)
 
             perspectives = None
-            with open(f"./storage/integrated_test/{type}_config/テスト観点.yml", 'r') as file:
+            with open(f"./storage/integrated_test/{typeName}_config/テスト観点.yml", 'r') as file:
                 perspectives = yaml.safe_load(file)
 
-            if type == 'component':
-                configComponent = IntegratedTestConfigComponent(block, perspectives)
-            elif type == 'batch':
-                configBatch = IntegratedTestConfigBatch(block, perspectives)
-            elif type == 'file':
-                configFile = IntegratedTestConfigFile(block, perspectives)
-            elif type == 'view':
-                configView = IntegratedTestConfigView(block, perspectives)
+            configs.append(IntegratedTestConfig(typeName, block, perspectives))
 
-        return IntegratedTestConfig(
-            configBatch,
-            configComponent,
-            configFile,
-            configView
-        )
+        return configs
