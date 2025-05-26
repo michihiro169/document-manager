@@ -1,18 +1,14 @@
 class IntegratedTestConfig():
-    def __init__(self, batch=None, component=None, file=None, view=None) -> None:
-        self.batch = batch
-        self.component = component
-        self.file = file
-        self.view = view
+    def __init__(self, type, block, perspectives) -> None:
+        self.type = type
+        self.block = block
+        self.perspectives = perspectives
 
-    def getBatch(self):
-        return self.batch
+    def getBlock(self):
+        return self.block
 
-    def getComponent(self):
-        return self.component
+    def getPerspectives(self) -> list:
+        return self.perspectives
 
-    def getFile(self):
-        return self.file
-
-    def getView(self):
-        return self.view
+    def getType(self) -> str:
+        return self.type
