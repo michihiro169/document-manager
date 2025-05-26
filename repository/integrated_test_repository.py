@@ -63,8 +63,11 @@ class IntegratedTestRepository():
 
     def getBlocks(self, path) -> list:
         dataSets = {}
-        with open("./storage/integrated_test/batch_config/データセット.yml", 'r') as file:
-            dataSets = yaml.safe_load(file)
+        try:
+            with open("./storage/integrated_test/global_config/データセット.yml", 'r') as file:
+                dataSets = yaml.safe_load(file)
+        except FileNotFoundError:
+            pass
 
         output = ''
         with open(path, 'r') as file:
