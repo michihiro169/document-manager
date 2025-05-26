@@ -84,10 +84,14 @@ class IntegratedTestRepository():
         return IntegratedTest(testBatchs, testComponents, testFiles, testViews)
 
     def getBlocks(self, path) -> list:
+        dataSets = {}
+        with open("./storage/integrated_test/batch_config/データセット.yml", 'r') as file:
+            dataSets = yaml.safe_load(file)
+
         output = ''
         with open(path, 'r') as file:
             template = Template(file.read())
-            output = template.render()
+            output = template.render(dataSets)
 
         data = yaml.safe_load(output)
 
