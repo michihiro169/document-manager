@@ -1,5 +1,5 @@
 class ExcelSheetCell():
-    def __init__(self, value, style = None, dataValidation = None, hyperLink=None) -> None:
+    def __init__(self, value = "", style = None, dataValidation = None, hyperLink=None) -> None:
         self.value = value
         self.style = style
         self.dataValidation = dataValidation

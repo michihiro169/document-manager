@@ -239,13 +239,11 @@ class IntegratedTestSpecification():
         matrixSheets = []
         for _, matrix in enumerate(integratedTest.getMatrices()):
             matrixSheetRows = []
-            evidenceIndex = matrix.getEvidenceIndex()
 
             # ヘッダ部
-            matrixSheetRowCells = [ExcelSheetCell('No.', ExcelSheetCellStyle(
-                fill = ExcelSheetCellFill('solid', 'c8e6c6')
-            ))]
-            for _, value in enumerate(matrix.getHeader()):
+            matrixSheetRowCells = []
+            matrixHeaderValues = ['No.'] + matrix.getHeader() + ['実施結果']
+            for _, value in enumerate(matrixHeaderValues):
                 line = ExcelSheetCellLine('thin', '000000')
                 matrixSheetRowCells.append(ExcelSheetCell(value, ExcelSheetCellStyle(
                     ExcelSheetCellBorder(line, line, line, line),
@@ -254,14 +252,16 @@ class IntegratedTestSpecification():
             matrixSheetRows.append(matrixSheetRowCells)
 
             # データ部
+            evidenceIndex = matrix.getEvidenceIndex()
             for matrixRowIndex, matrixRow in enumerate(matrix.getData()):
                 matrixSheetRowCells = [ExcelSheetCell('=ROW()-1')]
                 for index, matrixRowValue in enumerate(matrixRow):
                     if index == evidenceIndex and matrixRowValue == "要":
                         matrixSheetRowCells.append(ExcelSheetCell(
                             '要(クリックでエビデンスへ)',
-                            hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}"
-                        ))
+                            hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}")
+                        )
+                        matrixSheetRowCells.append(ExcelSheetCell(dataValidation=["○", "×", "-"]))
 
                         # エビデンスシートにマトリクステストケースへのリンクを追加
                         # +1はNo.列を考慮
