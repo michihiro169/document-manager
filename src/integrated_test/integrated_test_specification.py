@@ -15,7 +15,7 @@ from src.excel.sheet.cell.style.excel_sheet_cell_style import ExcelSheetCellStyl
 class IntegratedTestSpecification():
     @classmethod
     def createTestDataSheet(cls, testData):
-        # テストデータから再帰的に値を取り出す一時関数
+        # dictから再帰的に値を取り出す一時関数
         def extractData(data, path=None):
             if path is None:
                 path = []
@@ -24,11 +24,14 @@ class IntegratedTestSpecification():
 
             if isinstance(data, dict):
                 for key, value in data.items():
+                    # print(f"DICT: path={path + [key]} → dive into {value}")
                     results.extend(extractData(value, path + [key]))
             elif isinstance(data, list):
                 for index, item in enumerate(data):
+                    # print(f"LIST: path={path + [index]} → dive into {item}")
                     results.extend(extractData(item, path + [index]))
             else:
+                # print(f"VALUE: path={path} → value={data}")
                 results.append((path, data))
 
             return results
