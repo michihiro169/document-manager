@@ -19,7 +19,7 @@ integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
 
 integratedTestConfigs = integratedTestConfigRepository.find()
-integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
+integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1], sys.argv[2])]
 
 for index, integratedTest in enumerate(integratedTests):
     typeName = integratedTest.getType()
