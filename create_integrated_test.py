@@ -1,3 +1,4 @@
+import logging
 from lib.excel_lib import ExcelLib
 from repository.integrated_test_config_repository import IntegratedTestConfigRepository
 from repository.integrated_test_repository import IntegratedTestRepository
@@ -6,6 +7,13 @@ import sys
 
 # 結合テスト仕様書を生成する
 # コントローラー兼アプリケーションルール
+
+# ログ設定
+logging.basicConfig(
+    filename='./storage/log/app.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(message)s'
+)
 
 integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
