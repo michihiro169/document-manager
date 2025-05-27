@@ -71,7 +71,7 @@ class IntegratedTestSpecification():
             sheetRowCells = []
             for cellIndex, cell in enumerate(row):
                 # パディングセルか否か
-                # オートフィルタは列方向のみのため列方向の結合の基準は空欄でいい
+                # オートフィルタは行単位のため列方向の結合の基準は空欄でいい
                 if cell == "":
                     sheetRowCells.append(cls.createMergeCell(
                         cell,
@@ -83,8 +83,8 @@ class IntegratedTestSpecification():
                 else:
                     sheetRowCells.append(cls.createMergeCell(
                         cell,
-                        isTop    = rowIndex == 0                          or matrix[rowIndex - 1][cellIndex] != cell,
-                        isBottom = (rowIndex == len(matrix) - 1)          or matrix[rowIndex + 1][cellIndex] != cell,
+                        isTop    = rowIndex == 0                          or row[:cellIndex] != matrix[rowIndex-1][:cellIndex] or cell != matrix[rowIndex - 1][cellIndex],
+                        isBottom = (rowIndex == len(matrix) - 1)          or row[:cellIndex] != matrix[rowIndex+1][:cellIndex] or cell != matrix[rowIndex + 1][cellIndex],
                         isRight  = cellIndex == len(matrix[rowIndex]) - 1 or matrix[rowIndex][cellIndex + 1] != "",
                         isLeft   = cellIndex == 0                         or matrix[rowIndex][cellIndex - 1] != cell
                     ))
@@ -109,7 +109,7 @@ class IntegratedTestSpecification():
     def createStatusSheet(cls):
         values = [
             ['テストケース数', f"=MAX(テストケース!A:A)"],
-            ['実施予定数', f'=B1 - COUNTIF(テストケース!G:G,"-")'],
+            ['実施予定数', f'=B2 - COUNTIF(テストケース!G:G,"-")'],
             ['正常数', f'=COUNTIF(テストケース!G:G,"○")'],
             ['エラー数', f'=COUNTIF(テストケース!G:G,"×")'],
             ['進捗率', '=B3/B2'],
@@ -302,7 +302,7 @@ class IntegratedTestSpecification():
             "テストパターン",
             "手順",
             "想定結果",
-            "実施結果\n{環境名}",
+            "実施結果",
             "実施日",
             "実施者",
             "備考"
