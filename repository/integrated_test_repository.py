@@ -1,5 +1,6 @@
 import csv
 import glob
+import logging
 import os
 import re
 import yaml
@@ -69,6 +70,7 @@ class IntegratedTestRepository():
         except FileNotFoundError:
             pass
 
+        logging.info(f"{path}の読み込み開始")
         output = ''
         with open(path, 'r') as file:
             template = Template(file.read())

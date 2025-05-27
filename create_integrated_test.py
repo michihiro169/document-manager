@@ -1,3 +1,4 @@
+import logging
 from lib.excel_lib import ExcelLib
 from repository.integrated_test_config_repository import IntegratedTestConfigRepository
 from repository.integrated_test_repository import IntegratedTestRepository
@@ -7,11 +8,18 @@ import sys
 # 結合テスト仕様書を生成する
 # コントローラー兼アプリケーションルール
 
+# ログ設定
+logging.basicConfig(
+    filename='./storage/log/app.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(message)s'
+)
+
 integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
 
 integratedTestConfigs = integratedTestConfigRepository.find()
-integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1])]
+integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1], sys.argv[2])]
 
 for index, integratedTest in enumerate(integratedTests):
     typeName = integratedTest.getType()
