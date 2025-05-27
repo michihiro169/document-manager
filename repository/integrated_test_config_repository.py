@@ -19,7 +19,7 @@ class IntegratedTestConfigRepository():
                 for case in data[perspectiveName]:
                     cases.append(IntegratedTestCase(
                         case['パターン'],
-                        case['手順'],
+                        case["手順"] if "手順" in case else [],
                         case['想定結果'],
                         case['エビデンス'] if 'エビデンス' in case and case['エビデンス'] == '要' else False
                     ))
