@@ -50,3 +50,11 @@
       想定結果:
         - サンプル
   {% endfor %}
+
+# データセットサンプル(storage/integrated_test/global_config/データセット.yml.example 参照)
+データセットサンプル:
+  サンプル:
+    - パターン: "-"
+      想定結果:
+        - {{ key1 }}
+        - {{ key2[0] }}
