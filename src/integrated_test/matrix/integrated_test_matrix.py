@@ -5,7 +5,7 @@ class IntegratedTestMatrix():
         self.data = data
 
     def getEvidenceIndex(self):
-        return self.header.index('エビデンス')
+        return self.header.index('エビデンス') if 'エビデンス' in self.header else None
 
     def getName(self):
         return self.name

@@ -237,6 +237,7 @@ class IntegratedTestSpecification():
 
         # マトリクステストシート
         matrixSheets = []
+        line = ExcelSheetCellLine('thin', '000000')
         for _, matrix in enumerate(integratedTest.getMatrices()):
             matrixSheetRows = []
 
@@ -244,7 +245,6 @@ class IntegratedTestSpecification():
             matrixSheetRowCells = []
             matrixHeaderValues = ['No.'] + matrix.getHeader() + ['実施結果']
             for _, value in enumerate(matrixHeaderValues):
-                line = ExcelSheetCellLine('thin', '000000')
                 matrixSheetRowCells.append(ExcelSheetCell(value, ExcelSheetCellStyle(
                     ExcelSheetCellBorder(line, line, line, line),
                     fill = ExcelSheetCellFill('solid', 'c8e6c6')
@@ -254,14 +254,20 @@ class IntegratedTestSpecification():
             # データ部
             evidenceIndex = matrix.getEvidenceIndex()
             for matrixRowIndex, matrixRow in enumerate(matrix.getData()):
-                matrixSheetRowCells = [ExcelSheetCell('=ROW()-1')]
+                matrixSheetRowCells = [ExcelSheetCell('=ROW()-1', ExcelSheetCellStyle(
+                    ExcelSheetCellBorder(line, line, line, line),
+                    ExcelSheetCellFill('solid', 'ffffff')
+                ))]
                 for index, matrixRowValue in enumerate(matrixRow):
                     if index == evidenceIndex and matrixRowValue == "要":
                         matrixSheetRowCells.append(ExcelSheetCell(
                             '要(クリックでエビデンスへ)',
+                            ExcelSheetCellStyle(
+                                ExcelSheetCellBorder(line, line, line, line),
+                                ExcelSheetCellFill('solid', 'ffffff')
+                            ),
                             hyperLink = f"#エビデンス!A{evidenceSheetRowIndex}")
                         )
-                        matrixSheetRowCells.append(ExcelSheetCell(dataValidation=["○", "×", "-"]))
 
                         # エビデンスシートにマトリクステストケースへのリンクを追加
                         # +1はNo.列を考慮
@@ -276,11 +282,22 @@ class IntegratedTestSpecification():
 
                         evidenceSheetRowIndex = evidenceSheetRowIndex + evidenceSheetRowLen
                     else:
-                        matrixSheetRowCells.append(ExcelSheetCell(matrixRowValue))
+                        matrixSheetRowCells.append(ExcelSheetCell(matrixRowValue, ExcelSheetCellStyle(
+                            ExcelSheetCellBorder(line, line, line, line),
+                            ExcelSheetCellFill('solid', 'ffffff')
+                        )))
+                    if index == len(matrixRow) - 1:
+                        matrixSheetRowCells.append(ExcelSheetCell(
+                            style = ExcelSheetCellStyle(
+                                ExcelSheetCellBorder(line, line, line, line),
+                                ExcelSheetCellFill('solid', 'ffffff')
+                            ),
+                            dataValidation = ["○", "×", "-"]
+                        ))
                 matrixSheetRows.append(matrixSheetRowCells)
             # オートフィルタ
             alphabet = ExcelSpecification.getAlphabet(len(matrixSheetRows[0]) - 1)
-            matrixSheets.append(ExcelSheet(matrix.getName(), matrixSheetRows, [], ExcelSheetAutoFilter(f"A1:{alphabet}1")))
+            matrixSheets.append(ExcelSheet(matrix.getName(), matrixSheetRows, [6], ExcelSheetAutoFilter(f"A1:{alphabet}1")))
 
         sheets = [ExcelSheet(
             "テストケース",
