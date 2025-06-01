@@ -17,7 +17,15 @@ from src.integrated_test.integrated_test import IntegratedTest
 
 class IntegratedTestRepository():
     def find(self, typeName, name):
-        blocks = self.getBlocks(f"./storage/integrated_test/{typeName}/{name}/テストケース.yml")
+        # データセット読み込み
+        dataSets = {}
+        try:
+            with open("./storage/integrated_test/global_config/データセット.yml", 'r') as file:
+                dataSets = yaml.safe_load(file)
+        except FileNotFoundError:
+            pass
+
+        blocks = self.getBlocks(f"./storage/integrated_test/{typeName}/{name}/テストケース.yml", dataSets)
 
         matrices = []
         matrixPaths = sorted(glob.glob(f"./storage/integrated_test/{typeName}/{name}/マトリクス/*"))
@@ -39,14 +47,18 @@ class IntegratedTestRepository():
         preparation = None
         if os.path.isfile(preparationPath):
             with open(preparationPath, 'r') as file:
-                data = yaml.safe_load(file)
+                template = Template(file.read())
+                output = template.render(dataSets)
+                data = yaml.safe_load(output)
                 preparation = IntegratedTestPreparation([] if data == None else data)
 
         testDataPath = f"./storage/integrated_test/{typeName}/{name}/テストデータ.yml"
         testData = None
         if os.path.isfile(testDataPath):
             with open(testDataPath, 'r') as file:
-                data = yaml.safe_load(file)
+                template = Template(file.read())
+                output = template.render(dataSets)
+                data = yaml.safe_load(output)
                 testData = IntegratedTestData(data)
 
         return IntegratedTest(typeName, name, blocks, matrices, images, preparation, testData)
@@ -62,21 +74,14 @@ class IntegratedTestRepository():
                 integratedTests.append(self.find(typeName, name))
         return integratedTests
 
-    def getBlocks(self, path) -> list:
-        dataSets = {}
-        try:
-            with open("./storage/integrated_test/global_config/データセット.yml", 'r') as file:
-                dataSets = yaml.safe_load(file)
-        except FileNotFoundError:
-            pass
-
+    def getBlocks(self, path, dataSets) -> list:
         logging.info(f"{path}の読み込み開始")
-        output = ''
+
+        data = {}
         with open(path, 'r') as file:
             template = Template(file.read())
             output = template.render(dataSets)
-
-        data = yaml.safe_load(output)
+            data = yaml.safe_load(output)
 
         blocks = []
         for _, blockName in enumerate(data):
