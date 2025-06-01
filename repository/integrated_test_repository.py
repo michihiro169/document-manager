@@ -33,6 +33,10 @@ class IntegratedTestRepository():
             with open(matrixPath, 'r') as file:
                 reader = csv.reader(file)
                 data = [row for row in reader]
+
+                if ('エビデンス' in data[0]) and (data[0].index('エビデンス') != len(data[0]) - 1):
+                    raise Exception(f"{matrixPath}のエビデンス列を最後列にしてください")
+
                 matrices.append(IntegratedTestMatrix(os.path.splitext(os.path.basename(matrixPath))[0], data[0], data[1:]))
 
         images = []
@@ -77,21 +81,38 @@ class IntegratedTestRepository():
     def getBlocks(self, path, dataSets) -> list:
         logging.info(f"{path}の読み込み開始")
 
-        data = {}
+        if not os.path.isfile(path):
+            raise Exception(f"{path}が見つかりません")
+
+        data = None
         with open(path, 'r') as file:
             template = Template(file.read())
             output = template.render(dataSets)
             data = yaml.safe_load(output)
+        
+        if data is None:
+            raise Exception(f"{path}が空です")
 
         blocks = []
         for _, blockName in enumerate(data):
+            if data[blockName] is None:
+                raise Exception(f"{path}の{blockName}が空です")
+
             perspectives = []
             for _, perspectiveName in enumerate(data[blockName]):
+                if data[blockName][perspectiveName] is None:
+                    raise Exception(f"{path}の{blockName}の{perspectiveName}が空です")
+
                 cases = []
                 for _, case in enumerate(data[blockName][perspectiveName]):
+                    if case is None:
+                        raise Exception(f"{path}の{blockName}の{perspectiveName}のテストケースが空です")
+                    elif (not '想定結果' in case) or (not isinstance(case['想定結果'], list)):
+                        raise Exception(f"{path}の{blockName}の{perspectiveName}の想定結果が空です")
+
                     cases.append(IntegratedTestCase(
                         case['パターン'] if 'パターン' in case else '',
-                        case["手順"] if "手順" in case else [],
+                        case['手順'] if '手順' in case else [],
                         case['想定結果'],
                         case['エビデンス'] if 'エビデンス' in case and case['エビデンス'] == '要' else False
                     ))
