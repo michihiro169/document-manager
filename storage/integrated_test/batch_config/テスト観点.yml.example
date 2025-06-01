@@ -5,3 +5,15 @@ phpエラー確認:
 データ件数確認:
 
 データ確認: データの中身が正しいかの確認など
+
+# 変数宣言サンプル
+{% set perspectives = ["観点1", "観点2"] %}
+
+# 繰り返し生成サンプル
+{% for perspective in perspectives %}
+{{ perspective }}:
+{% endfor %}
+
+# データセットサンプル(storage/integrated_test/global_config/データセット.yml.example 参照)
+データセットサンプル1: {{ key1 }}
+データセットサンプル2: {{ key2[0] }}

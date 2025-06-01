@@ -1,2 +1,14 @@
 - シート「実施状況」の{環境名}を記載する
 - シート「テストデータ」を作成し{}で指定された箇所を埋める
+
+# 変数宣言サンプル
+{% set procedures = ["手順1", "手順2"] %}
+
+# 繰り返し生成サンプル
+{% for procedure in procedures %}
+- 繰り返し生成サンプル{{ procedure }}
+{% endfor %}
+
+# データセットサンプル(storage/integrated_test/global_config/データセット.yml.example 参照)
+- {{ key1 }}
+- {{ key2[0] }}
