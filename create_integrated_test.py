@@ -18,8 +18,14 @@ logging.basicConfig(
 integratedTestConfigRepository = IntegratedTestConfigRepository()
 integratedTestRepository = IntegratedTestRepository()
 
-integratedTestConfigs = integratedTestConfigRepository.find()
-integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1], sys.argv[2])]
+integratedTestConfigs = []
+integratedTests = []
+try:
+    integratedTestConfigs = integratedTestConfigRepository.find()
+    integratedTests = integratedTestRepository.get() if len(sys.argv) == 1 else [integratedTestRepository.find(sys.argv[1], sys.argv[2])]
+except Exception as e:
+    print(f"{e}")
+    exit()
 
 for index, integratedTest in enumerate(integratedTests):
     typeName = integratedTest.getType()
