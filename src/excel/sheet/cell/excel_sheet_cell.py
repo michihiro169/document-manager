@@ -15,7 +15,7 @@ class ExcelSheetCell():
         return self.style
 
     def getValue(self) -> str:
-        return self.value
+        return str(self.value)
     
     def hasHyperLink(self) -> bool:
         return self.hyperLink != None

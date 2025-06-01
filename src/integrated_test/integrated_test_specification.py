@@ -91,7 +91,13 @@ class IntegratedTestSpecification():
             sheetRows.append(sheetRowCells)
 
         alphabet = ExcelSpecification.getAlphabet(maxLen - 1)
-        return ExcelSheet("テストデータ", sheetRows, [30] * maxLen, ExcelSheetAutoFilter(f"A1:{alphabet}1"))
+
+        return ExcelSheet(
+            "テストデータ",
+            sheetRows,
+            cls.getAdjustedColumnWidths(sheetRows),
+            ExcelSheetAutoFilter(f"A1:{alphabet}1")
+        )
 
     @classmethod
     def createPerspectiveSheet(cls, config):
@@ -103,7 +109,7 @@ class IntegratedTestSpecification():
                 ExcelSheetCell('') if perspectives[name] == None else ExcelSheetCell(perspectives[name])
             ]
             rows.append(cells)
-        return ExcelSheet("テスト観点", rows)
+        return ExcelSheet("テスト観点", rows, cls.getAdjustedColumnWidths(rows))
 
     @classmethod
     def createStatusSheet(cls):
@@ -141,12 +147,7 @@ class IntegratedTestSpecification():
         # 行作成
         rows = []
         for value in [] if preparation == None else preparation.getList():
-            cellStyle = ExcelSheetCellStyle(
-                ExcelSheetCellBorder(None, None, None, None),
-                ExcelSheetCellFill('solid', 'ffffff'),
-                ExcelSheetCellAlignment('top'),
-            )
-            cell = ExcelSheetCell(value, cellStyle)
+            cell = ExcelSheetCell(value)
             rows.append([cell])
 
         return ExcelSheet("事前準備・注意点", rows)
@@ -297,7 +298,11 @@ class IntegratedTestSpecification():
                 matrixSheetRows.append(matrixSheetRowCells)
             # オートフィルタ
             alphabet = ExcelSpecification.getAlphabet(len(matrixSheetRows[0]) - 1)
-            matrixSheets.append(ExcelSheet(matrix.getName(), matrixSheetRows, [6], ExcelSheetAutoFilter(f"A1:{alphabet}1")))
+            matrixSheets.append(ExcelSheet(
+                matrix.getName(),
+                matrixSheetRows,
+                cls.getAdjustedColumnWidths(matrixSheetRows),
+                ExcelSheetAutoFilter(f"A1:{alphabet}1")))
 
         sheets = [ExcelSheet(
             "テストケース",
@@ -401,3 +406,8 @@ class IntegratedTestSpecification():
             f"結合テスト仕様書_{prefix}_{testBlockName}.xlsx",
             sheets
         )
+
+    @classmethod
+    def getAdjustedColumnWidths(cls, sheetRows):
+        maxLenCells =  [max(col, key=lambda x: 1 if x.getValue() == "=ROW()-1" else len(x.getValue())) for col in zip(*sheetRows)]
+        return [len(cell.getValue()) * 3 for cell in maxLenCells]
