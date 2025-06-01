@@ -35,7 +35,7 @@ for index, integratedTest in enumerate(integratedTests):
     elif typeName == 'view':
         prefix = 'ビュー'
 
-    print(f"{prefix}{integratedTest.getName()} 作成中...")
+    print(f"{prefix}_{integratedTest.getName()} 作成中...")
 
     # 結合テスト仕様書とタイプが同じの設定を取得
     integratedTestConfig = next((c for c in integratedTestConfigs if c.getType() == typeName), None)
