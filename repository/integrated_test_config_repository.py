@@ -1,4 +1,6 @@
+import logging
 import yaml
+from jinja2 import Template
 from src.integrated_test.case.integrated_test_case import IntegratedTestCase
 from src.integrated_test.config.integrated_test_config import IntegratedTestConfig
 from src.integrated_test.block.integrated_test_block import IntegratedTestBlock
@@ -6,12 +8,24 @@ from src.integrated_test.perspective.integrated_test_perspective import Integrat
 
 class IntegratedTestConfigRepository():
     def find(self) -> IntegratedTestConfig:
+        # データセット読み込み
+        dataSets = {}
+        try:
+            with open("./storage/integrated_test/global_config/データセット.yml", 'r') as file:
+                dataSets = yaml.safe_load(file)
+        except FileNotFoundError:
+            pass
+
         configs = []
         typeNames = ['component', 'batch', 'file', 'view']
         for typeName in typeNames:
+            logging.info(f"./storage/integrated_test/{typeName}_config/共通.ymlの読み込み開始")
+
             data = {}
             with open(f"./storage/integrated_test/{typeName}_config/共通.yml", 'r') as file:
-                data = yaml.safe_load(file)
+                template = Template(file.read())
+                output = template.render(dataSets)
+                data = yaml.safe_load(output)
 
             blockPerspectives = []
             for perspectiveName in data:
@@ -27,9 +41,13 @@ class IntegratedTestConfigRepository():
 
             block = IntegratedTestBlock("共通", blockPerspectives)
 
+            logging.info(f"./storage/integrated_test/{typeName}_config/テスト観点.ymlの読み込み開始")
+
             perspectives = None
             with open(f"./storage/integrated_test/{typeName}_config/テスト観点.yml", 'r') as file:
-                perspectives = yaml.safe_load(file)
+                template = Template(file.read())
+                output = template.render(dataSets)
+                perspectives = yaml.safe_load(output)
 
             configs.append(IntegratedTestConfig(typeName, block, perspectives))
 

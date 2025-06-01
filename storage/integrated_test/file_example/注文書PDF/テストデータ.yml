@@ -27,3 +27,17 @@
     項目2:
       id: "{id}"
       名称: "商品名2"
+
+# 変数宣言サンプル
+{% set account_names = ["アカウント1", "アカウント2"] %}
+
+# 繰り返し生成サンプル
+{% for account_name in account_names %}
+{{ account_name }}:
+  id: "{id}"
+{% endfor %}
+
+# データセットサンプル(storage/integrated_test/global_config/データセット.yml.example 参照)
+データセットサンプル:
+  - {{ key1 }}
+  - {{ key2[0] }}

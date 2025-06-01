@@ -185,7 +185,7 @@ class IntegratedTestSpecification():
                         perspective.getName(),
                         isPerspectiveTop,
                         isPerspectiveLast,
-                        list(integratedTestConfig.getPerspectives().keys())
+                        validationData = list(integratedTestConfig.getPerspectives().keys())
                     )
                     # テストパターンセル
                     patternCell = cls.createMergeCell(case.getPattern())
