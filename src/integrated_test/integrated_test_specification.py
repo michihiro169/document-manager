@@ -186,7 +186,7 @@ class IntegratedTestSpecification():
                         perspective.getName(),
                         isPerspectiveTop,
                         isPerspectiveLast,
-                        validationData = list(integratedTestConfig.getPerspectives().keys())
+                        validationData = '=テスト観点!$A:$A'
                     )
                     # テストパターンセル
                     patternCell = cls.createMergeCell(case.getPattern())
@@ -215,7 +215,7 @@ class IntegratedTestSpecification():
                         wrapText = True
                     )
                     # 実施結果、実施日、実施者、備考セル
-                    resultCell = cls.createMergeCell(validationData = ["○", "×", "-"])
+                    resultCell = cls.createMergeCell(validationData = '"○, ×, -"')
                     dateCell = cls.createMergeCell()
                     personCell = cls.createMergeCell()
                     remarkCell = cls.createMergeCell()
@@ -293,7 +293,7 @@ class IntegratedTestSpecification():
                                 ExcelSheetCellBorder(line, line, line, line),
                                 ExcelSheetCellFill('solid', 'ffffff')
                             ),
-                            dataValidation = ["○", "×", "-"]
+                            validationData = '"○, ×, -"'
                         ))
                 matrixSheetRows.append(matrixSheetRowCells)
             # オートフィルタ

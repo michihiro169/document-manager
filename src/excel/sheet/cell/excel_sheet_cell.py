@@ -1,12 +1,12 @@
 class ExcelSheetCell():
-    def __init__(self, value = "", style = None, dataValidation = None, hyperLink=None) -> None:
+    def __init__(self, value = "", style = None, validationData = None, hyperLink=None) -> None:
         self.value = value
         self.style = style
-        self.dataValidation = dataValidation
+        self.validationData = validationData
         self.hyperLink = hyperLink
 
-    def getDataValidation(self) -> list:
-        return self.dataValidation
+    def getValidationData(self) -> list:
+        return self.validationData
 
     def getHyperLink(self) -> str:
         return self.hyperLink
@@ -24,4 +24,4 @@ class ExcelSheetCell():
         return self.style != None
 
     def hasValidationList(self):
-        return self.dataValidation != None
+        return self.validationData != None
