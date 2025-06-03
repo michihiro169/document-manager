@@ -33,10 +33,9 @@ class ExcelLib():
                 for cellIndex, cell in enumerate(row):
                     # データバリデーション
                     if cell.hasValidationList():
-                        formula1 = ", ".join(cell.getDataValidation())
                         dv = DataValidation(
                             type="list",
-                            formula1=f'"{formula1}"',
+                            formula1=cell.getValidationData(),
                             allow_blank=True,
                             showErrorMessage=True
                         )
